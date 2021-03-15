@@ -15,7 +15,7 @@
   <name>alfresco-cli</name>
   <description>Demo project for Spring Boot with Picocli support</description>
   <properties>
-    <java.version>1.8</java.version>
+    <java.version>11</java.version>
   </properties>
 
   <dependencies>
@@ -30,13 +30,8 @@
       <artifactId>alfresco-java-rest-api-spring-boot-starter</artifactId>
       <version>5.0.0-SNAPSHOT</version>
     </dependency>
-    <!-- Java Event API
-    <dependency>
-      <groupId>org.alfresco</groupId>
-      <artifactId>alfresco-java-event-api-spring-boot-starter</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-    </dependency>
- -->
+    <!-- Java Event API <dependency> <groupId>org.alfresco</groupId> <artifactId>alfresco-java-event-api-spring-boot-starter</artifactId> 
+      <version>5.0.0-SNAPSHOT</version> </dependency> -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -58,6 +53,26 @@
         <configuration>
           <executable>true</executable>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <echo>Copying configuration</echo>
+                <copy file="src/main/resources/alfresco-cli-1.0.0.conf"
+                  tofile="${basedir}/target/alfresco-cli-1.0.0.conf" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

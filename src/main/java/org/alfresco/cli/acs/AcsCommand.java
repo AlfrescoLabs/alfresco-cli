@@ -4,21 +4,21 @@
  * pursuant to a written agreement and any use of this program without such an
  * agreement is prohibited.
  */
-package org.alfresco.cli;
+package org.alfresco.cli.acs;
 
 import java.util.concurrent.Callable;
-import org.alfresco.cli.acs.AcsCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "alfresco", mixinStandardHelpOptions = true, subcommands = AcsCommand.class)
-public class AlfrescoCommand implements Callable<Integer> {
+@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {NodeCommand.class, PeopleCommand.class},
+    exitCodeOnExecutionException = 34)
+public class AcsCommand implements Callable<Integer> {
 
   @Override
   public Integer call() {
     System.out.printf("Use -h for available subcommands.%n");
-    return 23;
+    return 1;
   }
 
 }
