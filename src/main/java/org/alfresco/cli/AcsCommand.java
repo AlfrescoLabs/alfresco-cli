@@ -9,19 +9,20 @@ package org.alfresco.cli;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.alfresco.cli.AcsCommand.CreateNodeCommand;
+import org.alfresco.cli.AcsCommand.DeleteNodeCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = CreateNodeCommand.class,
+@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {CreateNodeCommand.class, DeleteNodeCommand.class},
     exitCodeOnExecutionException = 34)
 public class AcsCommand implements Callable<Integer> {
 
   @Override
   public Integer call() {
-    System.out.printf("Please, specify a subcommand.");
+    System.out.printf("Use -h for available subcommands.");
     return 1;
   }
 

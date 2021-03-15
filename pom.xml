@@ -24,8 +24,9 @@
       <version>4.6.1</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-mail</artifactId>
+      <groupId>com.alfresco</groupId>
+      <artifactId>alfresco-core-rest-api</artifactId>
+      <version>7.1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -48,7 +49,6 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <executable>true</executable>
-          <finalName>alfresco.</finalName>
         </configuration>
       </plugin>
     </plugins>
