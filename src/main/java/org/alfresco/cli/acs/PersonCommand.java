@@ -8,6 +8,7 @@ package org.alfresco.cli.acs;
 
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.alfresco.cli.acs.PersonCommand.ListCommand;
 import org.alfresco.core.handler.PeopleApi;
 import org.alfresco.core.model.PersonPaging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "people", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-public class PeopleCommand implements Callable<Integer> {
+@Command(name = "person", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1, subcommands = {ListCommand.class})
+public class PersonCommand implements Callable<Integer> {
 
   @Autowired
   private PeopleApi peopleApi;
