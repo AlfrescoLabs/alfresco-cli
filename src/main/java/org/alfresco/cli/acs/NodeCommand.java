@@ -19,18 +19,11 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "node", mixinStandardHelpOptions = true, subcommands = {ListCommand.class, CreateCommand.class, DeleteCommand.class},
-    exitCodeOnExecutionException = 34)
-public class NodeCommand implements Callable<Integer> {
+@Command(name = "node", mixinStandardHelpOptions = true, subcommands = {ListCommand.class, CreateCommand.class, DeleteCommand.class})
+public class NodeCommand {
 
   @Autowired
   private NodesApi nodesApi;
-
-  @Override
-  public Integer call() {
-    System.out.printf("Use -h for available subcommands.%n");
-    return 1;
-  }
 
   @Component
   @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
@@ -64,7 +57,7 @@ public class NodeCommand implements Callable<Integer> {
   }
 
   @Component
-  @Command(name = "delete-node", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
+  @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
   class DeleteCommand implements Callable<Integer> {
 
     @Parameters(description = "node identifiers")

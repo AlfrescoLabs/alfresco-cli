@@ -17,17 +17,11 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "person", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1, subcommands = {ListCommand.class})
-public class PersonCommand implements Callable<Integer> {
+@Command(name = "person", mixinStandardHelpOptions = true, subcommands = {ListCommand.class})
+public class PersonCommand {
 
   @Autowired
   private PeopleApi peopleApi;
-
-  @Override
-  public Integer call() {
-    System.out.printf("Use -h for available subcommands.%n");
-    return 1;
-  }
 
   @Component
   @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
