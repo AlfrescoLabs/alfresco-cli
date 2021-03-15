@@ -16,7 +16,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {CreateNodeCommand.class, DeleteNodeCommand.class},
+@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {CreateNodeCommand.class, DeleteNodeCommand.class, PeopleCommand.class},
     exitCodeOnExecutionException = 34)
 public class AcsCommand implements Callable<Integer> {
 

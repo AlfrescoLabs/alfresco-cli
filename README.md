@@ -12,6 +12,8 @@ A Command Line Interface for Alfresco Repository and APA.
 Use *-h* for help with any command.
 Examples:
 
+    ./alfresco-cli-1.0.0.jar acs people-list
+
     ./alfresco-cli-1.0.0.jar -h
     ./alfresco-cli-1.0.0.jar acs -h
     ./alfresco-cli-1.0.0.jar acs create-node -h
