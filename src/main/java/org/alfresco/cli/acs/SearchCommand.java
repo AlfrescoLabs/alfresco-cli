@@ -6,8 +6,6 @@ import org.alfresco.search.model.RequestQuery;
 import org.alfresco.search.model.ResultSetRowEntry;
 import org.alfresco.search.model.SearchRequest;
 import org.alfresco.search.sql.handler.SqlApi;
-import org.alfresco.search.sql.model.SQLResultSetPaging;
-import org.alfresco.search.sql.model.SQLResultSetPagingList;
 import org.alfresco.search.sql.model.SQLResultSetRowEntry;
 import org.alfresco.search.sql.model.SQLSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +33,6 @@ public class SearchCommand {
         @CommandLine.ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Paging Options")
         PagingOptions pagingOptions;
 
-        static class PagingOptions {
-            @Option(names = {"-pmi", "--paging-max-items"}, description = "Max Items per Page", required = true)
-            private Integer pagingMaxItems;
-            @Option(names = {"-psc", "--paging-skip-count"}, description = "Skip Count initial results", required = true)
-            private Integer pagingSkipCount;
-        }
-
         SearchRequest getSearchRequest(RequestQuery.LanguageEnum language) {
             SearchRequest searchRequest = new SearchRequest()
                     .query(new RequestQuery()
@@ -53,6 +44,13 @@ public class SearchCommand {
                         .skipCount(pagingOptions.pagingSkipCount));
             }
             return searchRequest;
+        }
+
+        static class PagingOptions {
+            @Option(names = {"-pmi", "--paging-max-items"}, description = "Max Items per Page", required = true)
+            private Integer pagingMaxItems;
+            @Option(names = {"-psc", "--paging-skip-count"}, description = "Skip Count initial results", required = true)
+            private Integer pagingSkipCount;
         }
     }
 
