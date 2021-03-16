@@ -33,9 +33,9 @@ public class SiteCommand {
     @Command(description = "Get site list.")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                    description = "Number of items to be skipped (default: ${DEFAULT-VALUE})") Integer skipCount,
+                    description = "Number of items to be skipped") Integer skipCount,
             @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                    description = "Number of items to be recovered (default: ${DEFAULT-VALUE})") Integer maxItems,
+                    description = "Number of items to be returned") Integer maxItems,
             @Option(names = {"-w", "--where"},
                     description = "Filter for returned sites") String where) {
         List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
@@ -101,9 +101,9 @@ public class SiteCommand {
         @Command(description = "Get site container list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of items to be skipped (default: ${DEFAULT-VALUE})") Integer skipCount,
+                        description = "Number of items to be skipped") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of items to be recovered (default: ${DEFAULT-VALUE})") Integer maxItems) {
+                        description = "Number of items to be returned") Integer maxItems) {
             List<SiteContainerEntry> siteContainers =
                     sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList()
                             .getEntries();
@@ -127,9 +127,9 @@ public class SiteCommand {
         @Command(description = "Get site members list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of items to be skipped (default: ${DEFAULT-VALUE})") Integer skipCount,
+                        description = "Number of items to be skipped") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of items to be recovered (default: ${DEFAULT-VALUE})") Integer maxItems) {
+                        description = "Number of items to be returned") Integer maxItems) {
             List<SiteMemberEntry> members =
                     sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList()
                             .getEntries();

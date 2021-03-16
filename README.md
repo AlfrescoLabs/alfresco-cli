@@ -7,16 +7,18 @@ A Command Line Interface for Alfresco Repository and APA.
 
 ## Execution
 
+The generated JAR library is executable, so just run:
+
     ./alfresco-cli-1.0.0.jar
 
 Use *-h* for help with any command.
 Examples:
 
-    ./alfresco-cli-1.0.0.jar acs people-list
+    ./alfresco-cli-1.0.0.jar acs person list
 
     ./alfresco-cli-1.0.0.jar -h
     ./alfresco-cli-1.0.0.jar acs -h
-    ./alfresco-cli-1.0.0.jar acs create-node -h
-    ./alfresco-cli-1.0.0.jar acs delete-node -h
+    ./alfresco-cli-1.0.0.jar acs site create -h
+    ./alfresco-cli-1.0.0.jar acs node delete -h
 
     

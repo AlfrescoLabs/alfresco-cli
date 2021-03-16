@@ -67,7 +67,8 @@
             <configuration>
               <tasks>
                 <echo>Copying configuration</echo>
-                <copy file="src/main/resources/alfresco-cli-1.0.0.conf"
+                <copy
+                  file="src/main/resources/alfresco-cli-1.0.0.conf"
                   tofile="${basedir}/target/alfresco-cli-1.0.0.conf" />
               </tasks>
             </configuration>
