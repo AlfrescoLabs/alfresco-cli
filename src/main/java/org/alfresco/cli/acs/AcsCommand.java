@@ -6,11 +6,17 @@
  */
 package org.alfresco.cli.acs;
 
+import java.util.concurrent.Callable;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
 @Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {NodeCommand.class, PersonCommand.class})
-public class AcsCommand {
+public class AcsCommand implements Callable<Integer> {
 
+  @Override
+  public Integer call() {
+    System.out.printf("Use -h for available subcommands.");
+    return 1;
+  }
 }
