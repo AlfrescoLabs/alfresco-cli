@@ -1,8 +1,8 @@
 package org.alfresco.cli.acs;
 
 import java.util.List;
-import org.alfresco.cli.acs.SitesCommand.SiteContainerCommand;
-import org.alfresco.cli.acs.SitesCommand.SiteMemberCommand;
+import org.alfresco.cli.acs.SiteCommand.SiteContainerCommand;
+import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
 import org.alfresco.core.handler.SitesApi;
 import org.alfresco.core.model.Site;
 import org.alfresco.core.model.SiteBodyCreate;
@@ -25,7 +25,7 @@ import picocli.CommandLine.Parameters;
 @Component
 @Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class},
         description = "Site commands.")
-public class SitesCommand {
+public class SiteCommand {
 
     @Autowired
     SitesApi sitesApi;

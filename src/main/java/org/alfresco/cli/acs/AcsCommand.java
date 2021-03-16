@@ -12,7 +12,7 @@ import picocli.CommandLine.Command;
 
 @Component
 @Command(name = "acs", subcommands = {NodesCommand.class,
-    PersonCommand.class, GroupCommand.class, SitesCommand.class, SearchCommand.class})
+    PersonCommand.class, GroupCommand.class, SiteCommand.class, SearchCommand.class})
 public class AcsCommand implements Callable<Integer> {
 
   @Override
