@@ -63,7 +63,7 @@ public class SearchCommand {
             List<ResultSetRowEntry> result =
                     searchApi.search(getSearchRequest(RequestQuery.LanguageEnum.CMIS)).getBody().getList().getEntries();
             System.out.println(result);
-            return result.size();
+            return 0;
         }
     }
 
@@ -76,7 +76,7 @@ public class SearchCommand {
             List<ResultSetRowEntry> result =
                     searchApi.search(getSearchRequest(RequestQuery.LanguageEnum.AFTS)).getBody().getList().getEntries();
             System.out.println(result);
-            return result.size();
+            return 0;
         }
     }
 
@@ -94,7 +94,7 @@ public class SearchCommand {
         public Integer call() throws Exception {
             List<SQLResultSetRowEntry> result = sqlApi.search(new SQLSearchRequest().stmt(query)).getBody().getList().getEntries();
             System.out.println(result);
-            return result.size();
+            return 0;
         }
     }
 
