@@ -7,12 +7,14 @@
 package org.alfresco.cli;
 
 import org.alfresco.cli.acs.AcsCommand;
+import org.alfresco.cli.ags.AgsCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ScopeType;
 
 @Component
-@Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-        version = "1.0", subcommands = AcsCommand.class)
+@Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true,
+        exitCodeOnExecutionException = 1, showDefaultValues = true, usageHelpAutoWidth = true,
+        version = "1.0", subcommands = { AcsCommand.class, AgsCommand.class })
 public class AlfrescoCommand {
 }

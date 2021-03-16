@@ -17,7 +17,6 @@ import org.alfresco.core.model.SiteMembershipBodyUpdate;
 import org.alfresco.core.model.SiteRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -51,12 +50,9 @@ public class SiteCommand {
             @Option(names = {"-t", "--title"}, required = true,
                     description = "Title of the Site") String title,
             @Option(names = {"-v", "--visibility"}, required = true,
-                    description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED") String visibility) {
-        Site site =
-                sitesApi.createSite(
-                        new SiteBodyCreate().id(id).description(description).title(title)
-                                .visibility(SiteBodyCreate.VisibilityEnum.fromValue(visibility)),
-                        null, null, null).getBody().getEntry();
+                    description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteBodyCreate.VisibilityEnum visibility) {
+        Site site = sitesApi.createSite(new SiteBodyCreate().id(id).description(description)
+                .title(title).visibility(visibility), null, null, null).getBody().getEntry();
         System.out.println(site);
         return 0;
     }
@@ -75,13 +71,10 @@ public class SiteCommand {
             @Option(names = {"-t", "--title"}, required = true,
                     description = "Title of the Site") String title,
             @Option(names = {"-v", "--visibility"}, required = true,
-                    description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED") String visibility) {
-        Site site = sitesApi
-                .updateSite(id,
-                        new SiteBodyUpdate().title(title).description(description).visibility(
-                                SiteBodyUpdate.VisibilityEnum.fromValue(visibility)),
-                        null)
-                .getBody().getEntry();
+                    description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteBodyUpdate.VisibilityEnum visibility) {
+        Site site = sitesApi.updateSite(id,
+                new SiteBodyUpdate().title(title).description(description).visibility(visibility),
+                null).getBody().getEntry();
         System.out.println(site);
         return 0;
     }
@@ -137,25 +130,13 @@ public class SiteCommand {
             return 0;
         }
 
-        class MemberValues {
-            @Option(names = {"-mi", "--member-id"}, required = true, description = "User Id")
-            String id;
-            @Option(names = {"-mr", "--member-role"}, required = true,
-                    description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
-            String role;
-        }
-
         @Command(description = "Create site member.")
         public Integer create(@Parameters(description = "Id of the Site") String id,
-                @CommandLine.ArgGroup(exclusive = false, multiplicity = "1",
-                        heading = "Member Values") MemberValues memberValues) {
-            SiteMember siteMember = sitesApi
-                    .createSiteMembership(id,
-                            new SiteMembershipBodyCreate().id(memberValues.id)
-                                    .role(SiteMembershipBodyCreate.RoleEnum
-                                            .fromValue(memberValues.role)),
-                            null)
-                    .getBody().getEntry();
+                @Parameters(description = "User Id") String userId, @Parameters(
+                        description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyCreate.RoleEnum role) {
+            SiteMember siteMember = sitesApi.createSiteMembership(id,
+                    new SiteMembershipBodyCreate().id(userId).role(role), null).getBody()
+                    .getEntry();
             System.out.println(siteMember);
             return 0;
         }
@@ -172,13 +153,9 @@ public class SiteCommand {
         @Command(description = "Update site member.")
         public Integer update(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String personId, @Parameters(
-                        description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager") String role) {
-            SiteMember siteMember = sitesApi
-                    .updateSiteMembership(id, personId,
-                            new SiteMembershipBodyUpdate()
-                                    .role(SiteMembershipBodyUpdate.RoleEnum.fromValue(role)),
-                            null)
-                    .getBody().getEntry();
+                        description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
+            SiteMember siteMember = sitesApi.updateSiteMembership(id, personId,
+                    new SiteMembershipBodyUpdate().role(role), null).getBody().getEntry();
             System.out.println(siteMember);
             return 0;
         }

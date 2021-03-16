@@ -1,5 +1,7 @@
 package org.alfresco.cli.acs;
 
+import java.util.List;
+import java.util.concurrent.Callable;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.RequestPagination;
 import org.alfresco.search.model.RequestQuery;
@@ -10,12 +12,9 @@ import org.alfresco.search.sql.model.SQLResultSetRowEntry;
 import org.alfresco.search.sql.model.SQLSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.util.List;
-import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "search", subcommands =
@@ -30,7 +29,7 @@ public class SearchCommand {
         @Option(names = {"-q", "--query"}, required = true, description = "Query (examples >> \"select * from cmis:folder\", \"foo\")")
         String query;
 
-        @CommandLine.ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Paging Options")
+        @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Paging Options")
         PagingOptions pagingOptions;
 
         SearchRequest getSearchRequest(RequestQuery.LanguageEnum language) {
