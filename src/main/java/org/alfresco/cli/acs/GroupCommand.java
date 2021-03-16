@@ -26,14 +26,13 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "group", mixinStandardHelpOptions = true, subcommands = GroupMemberCommand.class)
+@Command(name = "group", subcommands = GroupMemberCommand.class)
 public class GroupCommand {
 
     @Autowired
     private GroupsApi groupsApi;
 
-    @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-            description = "Get group list.")
+    @Command(description = "Get group list.")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                     description = "Number of elements to be skipped") Integer skipCount,
@@ -49,8 +48,7 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-            description = "Create group.")
+    @Command(description = "Create group.")
     public Integer create(
             @Option(names = {"-id", "--id"}, required = true,
                     description = "Group identifier") String id,
@@ -65,19 +63,17 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(name = "get", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-            description = "Get group details.")
+    @Command(description = "Get group details.")
     public Integer get(
-            @Parameters(arity = "1", index = "0", description = "Group identifier") String id) {
+            @Parameters(description = "Group identifier") String id) {
         Group result = groupsApi.getGroup(id, null, null).getBody().getEntry();
         System.out.println(result);
         return 0;
     }
 
-    @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-            description = "Update group.")
+    @Command(description = "Update group.")
     public Integer update(
-            @Parameters(arity = "1", index = "0", description = "Group identifier") String id,
+            @Parameters(description = "Group identifier") String id,
             @Option(names = {"-dn", "--displayName"}, required = true,
                     description = "Display name") String displayName) {
         Group result = groupsApi
@@ -87,10 +83,9 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-            description = "Delete group.")
+    @Command(description = "Delete group.")
     public Integer delete(
-            @Parameters(arity = "1", index = "0", description = "Group identifier") String id,
+            @Parameters(description = "Group identifier") String id,
             @Option(names = {"-c", "--cascade"}, defaultValue = "false",
                     description = "Cascade deleted: true, false") Boolean cascade) {
         groupsApi.deleteGroup(id, cascade);
@@ -98,14 +93,12 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(name = "member", mixinStandardHelpOptions = true,
-            description = "List, create and delete group members.")
-    public class GroupMemberCommand {
+    @Command(name = "member", description = "List, create and delete group members.")
+    class GroupMemberCommand {
 
-        @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-                description = "List group members.")
-        public Integer listMembers(
-                @Parameters(arity = "1", index = "0", description = "Group identifier") String id,
+        @Command(description = "List group members.")
+        public Integer list(
+                @Parameters(description = "Group identifier") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                         description = "Number of elements to be skipped") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
@@ -119,13 +112,10 @@ public class GroupCommand {
             return 0;
         }
 
-        @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-                description = "Create group member.")
-        public Integer createMember(
-                @Parameters(arity = "1", index = "0", description = "Group identifier") String id,
-                @Parameters(arity = "1", index = "1", description = "User Id") String memberId,
-                @Parameters(arity = "1", index = "2",
-                        description = "Member type: GROUP, PERSON") String memberType) {
+        @Command(description = "Create group member.")
+        public Integer create(@Parameters(description = "Group identifier") String id,
+                @Parameters(description = "User Id") String memberId,
+                @Parameters(description = "Member type: GROUP, PERSON") String memberType) {
             GroupMember result = groupsApi
                     .createGroupMembership(id,
                             new GroupMembershipBodyCreate().id(memberId)
@@ -136,11 +126,9 @@ public class GroupCommand {
             return 0;
         }
 
-        @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
-                description = "Delete group member")
-        public Integer deleteMember(
-                @Parameters(arity = "1", index = "0", description = "Group identifier") String id,
-                @Parameters(arity = "1", index = "1", description = "User Id") String personId) {
+        @Command(description = "Delete group member.")
+        public Integer delete(@Parameters(description = "Group identifier") String id,
+                @Parameters(description = "User Id") String personId) {
             groupsApi.deleteGroupMembership(id, personId);
             System.out.println(personId);
             return 0;

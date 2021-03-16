@@ -25,119 +25,126 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "nodes", mixinStandardHelpOptions = true, subcommands = {NodesCommand.CreateNodeCommand.class, NodesCommand.UpdateNodeCommand.class})
+@Command(name = "node",
+        subcommands = {NodesCommand.CreateNodeCommand.class, NodesCommand.UpdateNodeCommand.class})
 public class NodesCommand {
 
-  private static final String ROOT_PATH = "/";
-  private static final String MY_ID = "-my-";
-  private static final String ROOT_ID = "-root-";
+    private static final String ROOT_PATH = "/";
+    private static final String MY_ID = "-my-";
+    private static final String ROOT_ID = "-root-";
 
-  @Component
-  @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
-  static class CreateNodeCommand extends NodeCommand {
+    @Component
+    @Command(name = "create", description = "Create node.")
+    static class CreateNodeCommand extends NodeCommand {
 
-    @Override
-    public Integer call() throws IOException {
-      final String nodeId = createNode();
-      updateNodeContent(nodeId);
-      return 0;
-    }
-  }
-
-  @Component
-  @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
-  static class UpdateNodeCommand extends NodeCommand {
-
-    @Parameters(index = "0", description = "The id or relative path of the node to be updated.")
-    private String node;
-
-    @Override
-    public Integer call() throws IOException {
-      final String nodeId = getNodeId(node);
-      updateNodeContent(nodeId);
-      updateNodeMetadata(nodeId);
-      return 0;
-    }
-  }
-
-  static abstract class NodeCommand implements Callable<Integer> {
-
-    @Option(names = {"-t", "--type"}, description = "Content type (example cm:content)")
-    String contentType = null;
-
-    @Option(names = {"-n", "--name"}, description = "Name of the node")
-    String name = null;
-
-    @Option(names = {"-p", "--parent"}, description = "Path of the parent folder of the node")
-    String parent = MY_ID;
-
-    @Option(names = {"-s", "--source"}, description = "File to be uploaded to ACS")
-    File source = null;
-
-    @Option(names = {"-v", "--major-version"}, description = "If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.")
-    Boolean majorVersion = null;
-
-    @Option(names = {"-c", "--comment"}, description = "Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.")
-    String comment = null;
-
-    @Option(names = {"-a", "--aspects"}, description = "One or more aspect times")
-    List<String> aspects = Collections.emptyList();
-
-    @Option(names = {"-m", "--metadata"}, description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
-    Map<String, String> metadata = Collections.emptyMap();
-
-    @Autowired
-    NodesApi nodesApi;
-
-    String getNodeId(String path) {
-      if (path.startsWith(ROOT_PATH)) {
-        ResponseEntity<NodeEntry> responseEntity = nodesApi.getNode(ROOT_ID, null, path, Collections.singletonList("id"));
-        if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
-          return responseEntity.getBody().getEntry().getId();
-        } else {
-          throw new RuntimeException(String.format("Unable to retrieve node id from path: %s", path));
+        @Override
+        public Integer call() throws IOException {
+            final String nodeId = createNode();
+            updateNodeContent(nodeId);
+            return 0;
         }
-      } else {
-        return path;
-      }
     }
 
-    String createNode() {
-      final String effectiveNodeType = contentType == null ? ContentModel.CM_CONTENT : contentType;
-      final String effectiveName = name != null ? name : source != null ? source.getName() : "unnamed";
-      final NodeBodyCreate nodeBodyCreate = new NodeBodyCreate()
-              .nodeType(effectiveNodeType)
-              .name(effectiveName)
-              .properties(metadata)
-              .aspectNames(aspects);
+    @Component
+    @Command(name = "update", description = "Update node.")
+    static class UpdateNodeCommand extends NodeCommand {
 
-      ResponseEntity<NodeEntry> responseEntity = nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
-      if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
-        final String nodeId = responseEntity.getBody().getEntry().getId();
-        System.out.println(String.format("Created %s node with name: %s and id: %s", effectiveNodeType, effectiveName, nodeId));
-        return nodeId;
-      } else {
-        throw new RuntimeException("Unable to create node. Service returned status: " + responseEntity.getStatusCode());
-      }
+        @Parameters(index = "0", description = "The id or relative path of the node to be updated.")
+        private String node;
+
+        @Override
+        public Integer call() throws IOException {
+            final String nodeId = getNodeId(node);
+            updateNodeContent(nodeId);
+            updateNodeMetadata(nodeId);
+            return 0;
+        }
     }
 
-    void updateNodeContent(String nodeId) throws IOException {
-      if(source != null) {
-        nodesApi.updateNodeContent(nodeId, FileUtils.readFileToByteArray(source), majorVersion, comment, name, null, null);
-        System.out.println(String.format("Node %s was updated with the content of %s", nodeId, source.getName()));
-      }
-    }
+    static abstract class NodeCommand implements Callable<Integer> {
 
-    void updateNodeMetadata(String nodeId) {
-      if(!metadata.isEmpty() || name != null || !aspects.isEmpty()) {
-        final NodeBodyUpdate nodeBodyUpdate = new NodeBodyUpdate()
-                .nodeType(contentType)
-                .properties(metadata)
-                .aspectNames(aspects)
-                .name(name);
+        @Option(names = {"-t", "--type"}, description = "Content type (example cm:content)")
+        String contentType = null;
 
-        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
-      }
+        @Option(names = {"-n", "--name"}, description = "Name of the node")
+        String name = null;
+
+        @Option(names = {"-p", "--parent"}, description = "Path of the parent folder of the node")
+        String parent = MY_ID;
+
+        @Option(names = {"-s", "--source"}, description = "File to be uploaded to ACS")
+        File source = null;
+
+        @Option(names = {"-v", "--major-version"},
+                description = "If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.")
+        Boolean majorVersion = null;
+
+        @Option(names = {"-c", "--comment"},
+                description = "Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.")
+        String comment = null;
+
+        @Option(names = {"-a", "--aspects"}, description = "One or more aspect times")
+        List<String> aspects = Collections.emptyList();
+
+        @Option(names = {"-m", "--metadata"},
+                description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
+        Map<String, String> metadata = Collections.emptyMap();
+
+        @Autowired
+        NodesApi nodesApi;
+
+        String getNodeId(String path) {
+            if (path.startsWith(ROOT_PATH)) {
+                ResponseEntity<NodeEntry> responseEntity =
+                        nodesApi.getNode(ROOT_ID, null, path, Collections.singletonList("id"));
+                if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
+                    return responseEntity.getBody().getEntry().getId();
+                } else {
+                    throw new RuntimeException(
+                            String.format("Unable to retrieve node id from path: %s", path));
+                }
+            } else {
+                return path;
+            }
+        }
+
+        String createNode() {
+            final String effectiveNodeType =
+                    contentType == null ? ContentModel.CM_CONTENT : contentType;
+            final String effectiveName =
+                    name != null ? name : source != null ? source.getName() : "unnamed";
+            final NodeBodyCreate nodeBodyCreate = new NodeBodyCreate().nodeType(effectiveNodeType)
+                    .name(effectiveName).properties(metadata).aspectNames(aspects);
+
+            ResponseEntity<NodeEntry> responseEntity =
+                    nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
+            if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
+                final String nodeId = responseEntity.getBody().getEntry().getId();
+                System.out.println(String.format("Created %s node with name: %s and id: %s",
+                        effectiveNodeType, effectiveName, nodeId));
+                return nodeId;
+            } else {
+                throw new RuntimeException("Unable to create node. Service returned status: "
+                        + responseEntity.getStatusCode());
+            }
+        }
+
+        void updateNodeContent(String nodeId) throws IOException {
+            if (source != null) {
+                nodesApi.updateNodeContent(nodeId, FileUtils.readFileToByteArray(source),
+                        majorVersion, comment, name, null, null);
+                System.out.println(String.format("Node %s was updated with the content of %s",
+                        nodeId, source.getName()));
+            }
+        }
+
+        void updateNodeMetadata(String nodeId) {
+            if (!metadata.isEmpty() || name != null || !aspects.isEmpty()) {
+                final NodeBodyUpdate nodeBodyUpdate = new NodeBodyUpdate().nodeType(contentType)
+                        .properties(metadata).aspectNames(aspects).name(name);
+
+                nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+            }
+        }
     }
-  }
 }

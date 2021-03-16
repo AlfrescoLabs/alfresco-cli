@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "search", mixinStandardHelpOptions = true, subcommands =
+@Command(name = "search", subcommands =
         {SearchCommand.CmisQueryCommand.class, SearchCommand.FtsQueryCommand.class, SearchCommand.SqlQueryCommand.class})
 public class SearchCommand {
 
@@ -55,7 +55,7 @@ public class SearchCommand {
     }
 
     @Component
-    @Command(name = "cmis", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
+    @Command(name = "cmis")
     class CmisQueryCommand extends AbstractSearchCommand {
 
         @Override
@@ -68,7 +68,7 @@ public class SearchCommand {
     }
 
     @Component
-    @Command(name = "fts", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
+    @Command(name = "fts")
     class FtsQueryCommand extends AbstractSearchCommand {
 
         @Override
@@ -81,7 +81,7 @@ public class SearchCommand {
     }
 
     @Component
-    @Command(name = "sql", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
+    @Command(name = "sql")
     class SqlQueryCommand implements Callable<Integer> {
 
         @Autowired

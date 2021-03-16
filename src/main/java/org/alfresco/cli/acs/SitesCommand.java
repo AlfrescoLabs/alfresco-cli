@@ -1,288 +1,191 @@
 package org.alfresco.cli.acs;
 
+import java.util.List;
+import org.alfresco.cli.acs.SitesCommand.SiteContainerCommand;
+import org.alfresco.cli.acs.SitesCommand.SiteMemberCommand;
 import org.alfresco.core.handler.SitesApi;
-import org.alfresco.core.model.*;
+import org.alfresco.core.model.Site;
+import org.alfresco.core.model.SiteBodyCreate;
+import org.alfresco.core.model.SiteBodyUpdate;
+import org.alfresco.core.model.SiteContainer;
+import org.alfresco.core.model.SiteContainerEntry;
+import org.alfresco.core.model.SiteEntry;
+import org.alfresco.core.model.SiteMember;
+import org.alfresco.core.model.SiteMemberEntry;
+import org.alfresco.core.model.SiteMembershipBodyCreate;
+import org.alfresco.core.model.SiteMembershipBodyUpdate;
+import org.alfresco.core.model.SiteRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "site", mixinStandardHelpOptions = true,
-        subcommands = {SitesCommand.ListSiteCommand.class,
-                SitesCommand.CreateSiteCommand.class,
-                SitesCommand.GetSiteCommand.class,
-                SitesCommand.UpdateSiteCommand.class,
-                SitesCommand.DeleteSiteCommand.class,
-                SitesCommand.ListContainerSiteCommand.class,
-                SitesCommand.GetContainerSiteCommand.class,
-                SitesCommand.ListMemberSiteCommand.class,
-                SitesCommand.CreateMemberSiteCommand.class,
-                SitesCommand.GetMemberSiteCommand.class,
-                SitesCommand.UpdateMemberSiteCommand.class,
-                SitesCommand.DeleteMemberSiteCommand.class})
+@Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class},
+        description = "Site commands.")
 public class SitesCommand {
 
     @Autowired
     SitesApi sitesApi;
 
-    @Component
-    @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class ListSiteCommand implements Callable<Integer> {
-
-        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0", description = "Number of sites to be skipped")
-        Integer skipCount;
-
-        @Option(names = {"-mi", "--max-items"}, defaultValue = "100", description = "Number of sites to be recovered")
-        Integer maxItems;
-
-        @Option(names = {"-w", "--where"}, description = "Filter for returned sites")
-        String where;
-
-        @Override
-        public Integer call() throws Exception {
-            List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where).getBody().getList().getEntries();
-            System.out.println(sites);
-            return 0;
-        }
+    @Command(description = "Get site list.")
+    public Integer list(
+            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                    description = "Number of sites to be skipped") Integer skipCount,
+            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                    description = "Number of sites to be recovered") Integer maxItems,
+            @Option(names = {"-w", "--where"},
+                    description = "Filter for returned sites") String where) {
+        List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
+                .getBody().getList().getEntries();
+        System.out.println(sites);
+        return 0;
     }
 
-    @Component
-    @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class CreateSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-d", "--description"}, description = "Description of the Site")
-        String description;
-
-        @Option(names = {"-t", "--title"}, required = true, description = "Title of the Site")
-        String title;
-
-        @Option(names = {"-v", "--visibility"}, required = true, description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED")
-        String visibility;
-
-        @Override
-        public Integer call() throws Exception {
-            Site site = sitesApi.createSite(
-                    new SiteBodyCreate()
-                            .id(id)
-                            .description(description)
-                            .title(title)
-                            .visibility(SiteBodyCreate.VisibilityEnum.fromValue(visibility)),
-                    null, null, null).getBody().getEntry();
-            System.out.println(site);
-            return 0;
-        }
+    @Command(description = "Create site.")
+    public Integer create(@Parameters(description = "Id of the Site") String id,
+            @Option(names = {"-d", "--description"},
+                    description = "Description of the Site") String description,
+            @Option(names = {"-t", "--title"}, required = true,
+                    description = "Title of the Site") String title,
+            @Option(names = {"-v", "--visibility"}, required = true,
+                    description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED") String visibility) {
+        Site site =
+                sitesApi.createSite(
+                        new SiteBodyCreate().id(id).description(description).title(title)
+                                .visibility(SiteBodyCreate.VisibilityEnum.fromValue(visibility)),
+                        null, null, null).getBody().getEntry();
+        System.out.println(site);
+        return 0;
     }
 
-    @Component
-    @Command(name = "get", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class GetSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Override
-        public Integer call() throws Exception {
-            Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
-            System.out.println(site);
-            return 0;
-        }
+    @Command(description = "Get site details.")
+    public Integer get(@Parameters(description = "Id of the Site") String id) {
+        Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
+        System.out.println(site);
+        return 0;
     }
 
-    @Component
-    @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class UpdateSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-d", "--description"}, required = true, description = "Description of the Site")
-        String description;
-
-        @Option(names = {"-t", "--title"}, required = true, description = "Title of the Site")
-        String title;
-
-        @Option(names = {"-v", "--visibility"}, required = true, description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED")
-        String visibility;
-
-        @Override
-        public Integer call() throws Exception {
-            Site site = sitesApi.updateSite(id,
-                    new SiteBodyUpdate().title(title).description(description).visibility(SiteBodyUpdate.VisibilityEnum.fromValue(visibility)),
-                    null)
-                    .getBody().getEntry();
-            System.out.println(site);
-            return 0;
-        }
+    @Command(name = "update")
+    public Integer update(@Parameters(description = "Id of the Site") String id,
+            @Option(names = {"-d", "--description"}, required = true,
+                    description = "Description of the Site") String description,
+            @Option(names = {"-t", "--title"}, required = true,
+                    description = "Title of the Site") String title,
+            @Option(names = {"-v", "--visibility"}, required = true,
+                    description = "Visibility of the Site: PUBLIC, PRIVATE, MODERATED") String visibility) {
+        Site site = sitesApi
+                .updateSite(id,
+                        new SiteBodyUpdate().title(title).description(description).visibility(
+                                SiteBodyUpdate.VisibilityEnum.fromValue(visibility)),
+                        null)
+                .getBody().getEntry();
+        System.out.println(site);
+        return 0;
     }
 
-    @Component
-    @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class DeleteSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-p", "--permanent"}, defaultValue = "false", description = "Permanently deleted: true, false")
-        Boolean permanent;
-
-        @Override
-        public Integer call() throws Exception {
-            sitesApi.deleteSite(id, permanent);
-            System.out.println(id);
-            return 0;
-        }
+    @Command(description = "Delete site.")
+    public Integer delete(@Parameters(description = "Id of the Site") String id,
+            @Option(names = {"-p", "--permanent"}, defaultValue = "false",
+                    description = "Permanently deleted: true, false") Boolean permanent) {
+        sitesApi.deleteSite(id, permanent);
+        System.out.println(id);
+        return 0;
     }
 
-    @Component
-    @Command(name = "list-containers", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class ListContainerSiteCommand implements Callable<Integer> {
+    @Command(name = "container", description = "Site container commands.")
+    public class SiteContainerCommand {
 
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0", description = "Number of sites to be skipped")
-        Integer skipCount;
-
-        @Option(names = {"-mi", "--max-items"}, defaultValue = "100", description = "Number of sites to be recovered")
-        Integer maxItems;
-
-        @Override
-        public Integer call() throws Exception {
-            List<SiteContainerEntry> siteContainers = sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList().getEntries();
+        @Command(description = "Get site container list.")
+        public Integer list(@Parameters(description = "Id of the Site") String id,
+                @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                        description = "Number of sites to be skipped") Integer skipCount,
+                @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                        description = "Number of sites to be recovered") Integer maxItems) {
+            List<SiteContainerEntry> siteContainers =
+                    sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList()
+                            .getEntries();
             System.out.println(siteContainers);
             return 0;
         }
-    }
 
-    @Component
-    @Command(name = "get-container", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class GetContainerSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-ci", "--container-id"}, required = true, description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki")
-        String containerId;
-
-        @Override
-        public Integer call() throws Exception {
-            SiteContainer siteContainer = sitesApi.getSiteContainer(id, containerId, null).getBody().getEntry();
+        @Command(description = "Get site container details")
+        public Integer get(@Parameters(description = "Id of the Site") String id, @Parameters(
+                description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki") String containerId) {
+            SiteContainer siteContainer =
+                    sitesApi.getSiteContainer(id, containerId, null).getBody().getEntry();
             System.out.println(siteContainer);
             return 0;
         }
     }
 
-    @Component
-    @Command(name = "list-members", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class ListMemberSiteCommand implements Callable<Integer> {
+    @Command(name = "member", description = "Site members commands.")
+    public class SiteMemberCommand {
 
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0", description = "Number of sites to be skipped")
-        Integer skipCount;
-
-        @Option(names = {"-mi", "--max-items"}, defaultValue = "100", description = "Number of sites to be recovered")
-        Integer maxItems;
-
-        @Override
-        public Integer call() throws Exception {
-            List<SiteMemberEntry> members = sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList().getEntries();
+        @Command(description = "Get site members list.")
+        public Integer list(@Parameters(description = "Id of the Site") String id,
+                @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                        description = "Number of sites to be skipped") Integer skipCount,
+                @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                        description = "Number of sites to be recovered") Integer maxItems) {
+            List<SiteMemberEntry> members =
+                    sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList()
+                            .getEntries();
             System.out.println(members);
             return 0;
         }
-    }
-
-    @Component
-    @Command(name = "create-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class CreateMemberSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @CommandLine.ArgGroup(exclusive = false, multiplicity = "1", heading = "Member Values")
-        MemberValues memberValues;
 
         class MemberValues {
             @Option(names = {"-mi", "--member-id"}, required = true, description = "User Id")
             String id;
-            @Option(names = {"-mr", "--member-role"}, required = true, description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
+            @Option(names = {"-mr", "--member-role"}, required = true,
+                    description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
             String role;
         }
 
-        @Override
-        public Integer call() throws Exception {
-            SiteMember siteMember = sitesApi.createSiteMembership(id,
-                    new SiteMembershipBodyCreate()
-                            .id(memberValues.id)
-                            .role(SiteMembershipBodyCreate.RoleEnum.fromValue(memberValues.role)), null)
+        @Command(description = "Create site member.")
+        public Integer create(@Parameters(description = "Id of the Site") String id,
+                @CommandLine.ArgGroup(exclusive = false, multiplicity = "1",
+                        heading = "Member Values") MemberValues memberValues) {
+            SiteMember siteMember = sitesApi
+                    .createSiteMembership(id,
+                            new SiteMembershipBodyCreate().id(memberValues.id)
+                                    .role(SiteMembershipBodyCreate.RoleEnum
+                                            .fromValue(memberValues.role)),
+                            null)
                     .getBody().getEntry();
             System.out.println(siteMember);
             return 0;
         }
-    }
 
-    @Component
-    @Command(name = "get-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class GetMemberSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Parameters(arity = "1", index = "1", description = "User Id")
-        String personId;
-
-        @Override
-        public Integer call() throws Exception {
-            SiteRole siteRole = sitesApi.getSiteMembershipForPerson(personId, id).getBody().getEntry();
+        @Command(description = "Get site member details.")
+        public Integer get(@Parameters(description = "Id of the Site") String id,
+                @Parameters(description = "User Id") String personId) {
+            SiteRole siteRole =
+                    sitesApi.getSiteMembershipForPerson(personId, id).getBody().getEntry();
             System.out.println(siteRole);
             return 0;
         }
-    }
 
-    @Component
-    @Command(name = "update-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class UpdateMemberSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Parameters(arity = "1", index = "1", description = "User Id")
-        String personId;
-
-        @Parameters(arity = "1", index = "1", description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
-        String role;
-
-        @Override
-        public Integer call() throws Exception {
-            SiteMember siteMember = sitesApi.updateSiteMembership(id, personId,
-                    new SiteMembershipBodyUpdate()
-                            .role(SiteMembershipBodyUpdate.RoleEnum.fromValue(role)), null).getBody().getEntry();
+        @Command(description = "Update site member.")
+        public Integer update(@Parameters(description = "Id of the Site") String id,
+                @Parameters(description = "User Id") String personId, @Parameters(
+                        description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager") String role) {
+            SiteMember siteMember = sitesApi
+                    .updateSiteMembership(id, personId,
+                            new SiteMembershipBodyUpdate()
+                                    .role(SiteMembershipBodyUpdate.RoleEnum.fromValue(role)),
+                            null)
+                    .getBody().getEntry();
             System.out.println(siteMember);
             return 0;
         }
-    }
 
-    @Component
-    @Command(name = "delete-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
-    class DeleteMemberSiteCommand implements Callable<Integer> {
-
-        @Parameters(arity = "1", index = "0", description = "Id of the Site")
-        private String id;
-
-        @Parameters(arity = "1", index = "1", description = "User Id")
-        String personId;
-
-        @Override
-        public Integer call() throws Exception {
+        @Command(description = "Delete site member.")
+        public Integer delete(@Parameters(description = "Id of the Site") String id,
+                @Parameters(description = "User Id") String personId) {
             sitesApi.deleteSiteMembership(id, personId);
             System.out.println(personId);
             return 0;

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "acs", mixinStandardHelpOptions = true, subcommands = {NodesCommand.class,
+@Command(name = "acs", subcommands = {NodesCommand.class,
     PersonCommand.class, GroupCommand.class, SitesCommand.class, SearchCommand.class})
 public class AcsCommand implements Callable<Integer> {
 

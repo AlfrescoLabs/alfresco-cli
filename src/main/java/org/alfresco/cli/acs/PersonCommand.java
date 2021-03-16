@@ -17,14 +17,14 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "person", mixinStandardHelpOptions = true, subcommands = {ListCommand.class})
+@Command(name = "person", subcommands = {ListCommand.class})
 public class PersonCommand {
 
   @Autowired
   private PeopleApi peopleApi;
 
   @Component
-  @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
+  @Command(name = "list")
   class ListCommand implements Callable<Integer> {
 
     @Override

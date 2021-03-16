@@ -9,8 +9,10 @@ package org.alfresco.cli;
 import org.alfresco.cli.acs.AcsCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ScopeType;
 
 @Component
-@Command(name = "alfresco", mixinStandardHelpOptions = true, subcommands = AcsCommand.class)
+@Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1,
+        version = "1.0", subcommands = AcsCommand.class)
 public class AlfrescoCommand {
 }
