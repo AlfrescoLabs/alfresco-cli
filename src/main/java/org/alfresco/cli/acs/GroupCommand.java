@@ -35,11 +35,11 @@ public class GroupCommand {
     @Command(description = "Get group list.")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                    description = "Number of elements to be skipped") Integer skipCount,
+                    description = "Number of items to be skipped (default: ${DEFAULT-VALUE})") Integer skipCount,
             @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                    description = "Number of elements to be recovered") Integer maxItems,
+                    description = "Number of items to be recovered (default: ${DEFAULT-VALUE})") Integer maxItems,
             @Option(names = {"-w", "--where"},
-                    description = "Filter for returned elements") String where) {
+                    description = "Filter for returned items") String where) {
         ResponseEntity<GroupPaging> response =
                 groupsApi.listGroups(skipCount, maxItems, null, null, where, null);
         String result = response.getBody().getList().getEntries().stream()
@@ -87,7 +87,7 @@ public class GroupCommand {
     public Integer delete(
             @Parameters(description = "Group identifier") String id,
             @Option(names = {"-c", "--cascade"}, defaultValue = "false",
-                    description = "Cascade deleted: true, false") Boolean cascade) {
+                    description = "Cascade deleted: true, false (default: ${DEFAULT-VALUE})") Boolean cascade) {
         groupsApi.deleteGroup(id, cascade);
         System.out.println(id);
         return 0;
@@ -100,11 +100,11 @@ public class GroupCommand {
         public Integer list(
                 @Parameters(description = "Group identifier") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of elements to be skipped") Integer skipCount,
+                        description = "Number of items to be skipped (default: ${DEFAULT-VALUE})") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of elements to be recovered") Integer maxItems,
+                        description = "Number of items to be recovered (default: ${DEFAULT-VALUE})") Integer maxItems,
                 @Option(names = {"-w", "--where"},
-                        description = "Filter for returned elements") String where) {
+                        description = "Filter for returned items") String where) {
             List<GroupMemberEntry> result =
                     groupsApi.listGroupMemberships(id, skipCount, maxItems, null, where, null)
                             .getBody().getList().getEntries();
