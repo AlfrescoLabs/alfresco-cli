@@ -48,7 +48,7 @@ public class NodesCommand {
   @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
   static class UpdateNodeCommand extends NodeCommand {
 
-    @Parameters  (index = "0", description = "The id or relative path of the node to be updated.")
+    @Parameters(index = "0", description = "The id or relative path of the node to be updated.")
     private String node;
 
     @Override

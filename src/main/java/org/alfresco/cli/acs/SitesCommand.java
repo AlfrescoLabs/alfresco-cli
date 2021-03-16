@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
+import picocli.CommandLine.Parameters;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "sites", mixinStandardHelpOptions = true,
+@Command(name = "site", mixinStandardHelpOptions = true,
         subcommands = {SitesCommand.ListSiteCommand.class,
                 SitesCommand.CreateSiteCommand.class,
                 SitesCommand.GetSiteCommand.class,
@@ -24,8 +24,7 @@ import java.util.concurrent.Callable;
                 SitesCommand.CreateMemberSiteCommand.class,
                 SitesCommand.GetMemberSiteCommand.class,
                 SitesCommand.UpdateMemberSiteCommand.class,
-                SitesCommand.DeleteMemberSiteCommand.class},
-        exitCodeOnExecutionException = 1)
+                SitesCommand.DeleteMemberSiteCommand.class})
 public class SitesCommand {
 
     @Autowired
@@ -41,9 +40,12 @@ public class SitesCommand {
         @Option(names = {"-mi", "--max-items"}, defaultValue = "100", description = "Number of sites to be recovered")
         Integer maxItems;
 
+        @Option(names = {"-w", "--where"}, description = "Filter for returned sites")
+        String where;
+
         @Override
         public Integer call() throws Exception {
-            List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, null).getBody().getList().getEntries();
+            List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where).getBody().getList().getEntries();
             System.out.println(sites);
             return 0;
         }
@@ -53,8 +55,8 @@ public class SitesCommand {
     @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class CreateSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-d", "--description"}, description = "Description of the Site")
         String description;
@@ -83,8 +85,8 @@ public class SitesCommand {
     @Command(name = "get", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class GetSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Override
         public Integer call() throws Exception {
@@ -98,8 +100,8 @@ public class SitesCommand {
     @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class UpdateSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-d", "--description"}, required = true, description = "Description of the Site")
         String description;
@@ -125,8 +127,8 @@ public class SitesCommand {
     @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class DeleteSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-p", "--permanent"}, defaultValue = "false", description = "Permanently deleted: true, false")
         Boolean permanent;
@@ -143,8 +145,8 @@ public class SitesCommand {
     @Command(name = "list-containers", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class ListContainerSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-sc", "--skip-count"}, defaultValue = "0", description = "Number of sites to be skipped")
         Integer skipCount;
@@ -164,8 +166,8 @@ public class SitesCommand {
     @Command(name = "get-container", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class GetContainerSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-ci", "--container-id"}, required = true, description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki")
         String containerId;
@@ -182,8 +184,8 @@ public class SitesCommand {
     @Command(name = "list-members", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class ListMemberSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @Option(names = {"-sc", "--skip-count"}, defaultValue = "0", description = "Number of sites to be skipped")
         Integer skipCount;
@@ -203,8 +205,8 @@ public class SitesCommand {
     @Command(name = "create-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class CreateMemberSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
         @CommandLine.ArgGroup(exclusive = false, multiplicity = "1", heading = "Member Values")
         MemberValues memberValues;
@@ -232,10 +234,10 @@ public class SitesCommand {
     @Command(name = "get-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class GetMemberSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
-        @Option(names = {"-mi", "--member-id"}, required = true, description = "User Id")
+        @Parameters(arity = "1", index = "1", description = "User Id")
         String personId;
 
         @Override
@@ -250,13 +252,13 @@ public class SitesCommand {
     @Command(name = "update-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class UpdateMemberSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
-        @Option(names = {"-mi", "--member-id"}, required = true, description = "User Id")
+        @Parameters(arity = "1", index = "1", description = "User Id")
         String personId;
 
-        @Option(names = {"-mr", "--member-role"}, required = true, description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
+        @Parameters(arity = "1", index = "1", description = "Role in the Site: SiteConsumer, SiteCollaborator, SiteContributor, SiteManager")
         String role;
 
         @Override
@@ -273,10 +275,10 @@ public class SitesCommand {
     @Command(name = "delete-member", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 1)
     class DeleteMemberSiteCommand implements Callable<Integer> {
 
-        @Option(names = {"-id", "--id"}, required = true, description = "Id of the Site")
-        String id;
+        @Parameters(arity = "1", index = "0", description = "Id of the Site")
+        private String id;
 
-        @Option(names = {"-mi", "--member-id"}, required = true, description = "User Id")
+        @Parameters(arity = "1", index = "1", description = "User Id")
         String personId;
 
         @Override
