@@ -8,10 +8,15 @@ package org.alfresco.cli.acs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
+import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.core.model.NodeEntry;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,16 +64,15 @@ public class NodesCommand implements Callable<Integer> {
     public Integer call() throws IOException {
       final String nodeId = getNodeId(node);
       updateNodeContent(nodeId);
+      updateNodeMetadata(nodeId);
       return 0;
     }
   }
 
-
-
   static abstract class NodeCommand implements Callable<Integer> {
 
     @Option(names = {"-t", "--type"}, description = "Content type (example cm:content)")
-    String contentType = "cm:content";
+    String contentType = null;
 
     @Option(names = {"-n", "--name"}, description = "Name of the node")
     String name = null;
@@ -84,6 +88,13 @@ public class NodesCommand implements Callable<Integer> {
 
     @Option(names = {"-c", "--comment"}, description = "Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.")
     String comment = null;
+
+    @Option(names = {"-a", "--aspects"}, description = "One or more aspect times")
+    List<String> aspects = Collections.emptyList();
+
+    @Option(names = {"-m", "--metadata"}, description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
+    Map<String, String> metadata = Collections.emptyMap();
+
 
     @Autowired
     NodesApi nodesApi;
@@ -102,14 +113,18 @@ public class NodesCommand implements Callable<Integer> {
     }
 
     String createNode() {
+      final String effectiveNodeType = contentType == null ? ContentModel.CM_CONTENT : contentType;
+      final String effectiveName = name != null ? name : source != null ? source.getName() : "unnamed";
       final NodeBodyCreate nodeBodyCreate = new NodeBodyCreate()
-              .nodeType(contentType)
-              .name(source != null ? source.getName() : name);
+              .nodeType(effectiveNodeType)
+              .name(effectiveName)
+              .properties(metadata)
+              .aspectNames(aspects);
 
       ResponseEntity<NodeEntry> responseEntity = nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
       if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
         final String nodeId = responseEntity.getBody().getEntry().getId();
-        System.out.println(String.format("created node %s of type %s with id: %s", name, contentType, nodeId));
+        System.out.println(String.format("Created %s node with name: %s and id: %s", effectiveNodeType, effectiveName, nodeId));
         return nodeId;
       } else {
         throw new RuntimeException("Unable to create node. Service returned status: " + responseEntity.getStatusCode());
@@ -123,6 +138,16 @@ public class NodesCommand implements Callable<Integer> {
       }
     }
 
+    void updateNodeMetadata(String nodeId) {
+      if(!metadata.isEmpty() || name != null || !aspects.isEmpty()) {
+        final NodeBodyUpdate nodeBodyUpdate = new NodeBodyUpdate()
+                .nodeType(contentType)
+                .properties(metadata)
+                .aspectNames(aspects)
+                .name(name);
 
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+      }
+    }
   }
 }
