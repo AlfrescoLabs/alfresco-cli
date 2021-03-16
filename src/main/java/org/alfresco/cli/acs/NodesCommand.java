@@ -8,8 +8,6 @@ package org.alfresco.cli.acs;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,23 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "nodes", mixinStandardHelpOptions = true, subcommands = {NodesCommand.CreateNodeCommand.class, NodesCommand.UpdateNodeCommand.class},
-    exitCodeOnExecutionException = 34)
-public class NodesCommand implements Callable<Integer> {
+@Command(name = "nodes", mixinStandardHelpOptions = true, subcommands = {NodesCommand.CreateNodeCommand.class, NodesCommand.UpdateNodeCommand.class})
+public class NodesCommand {
 
   private static final String ROOT_PATH = "/";
   private static final String MY_ID = "-my-";
   private static final String ROOT_ID = "-root-";
-
-  @Override
-  public Integer call() {
-    System.out.printf("Use -h for available subcommands.");
-    return 1;
-  }
 
   @Component
   @Command(name = "create", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
@@ -94,7 +85,6 @@ public class NodesCommand implements Callable<Integer> {
 
     @Option(names = {"-m", "--metadata"}, description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
     Map<String, String> metadata = Collections.emptyMap();
-
 
     @Autowired
     NodesApi nodesApi;
