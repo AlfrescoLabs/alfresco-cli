@@ -122,71 +122,93 @@ function _complete_alfresco() {
   local cmds4=(acs group)
   local cmds5=(acs site)
   local cmds6=(acs search)
-  local cmds7=(acs node create)
+  local cmds7=(acs node list)
   local cmds8=(acs node update)
-  local cmds9=(acs person list)
-  local cmds10=(acs group member)
-  local cmds11=(acs group create)
-  local cmds12=(acs group delete)
-  local cmds13=(acs group get)
-  local cmds14=(acs group list)
-  local cmds15=(acs group update)
-  local cmds16=(acs group member create)
-  local cmds17=(acs group member delete)
-  local cmds18=(acs group member list)
-  local cmds19=(acs site container)
-  local cmds20=(acs site member)
-  local cmds21=(acs site create)
-  local cmds22=(acs site delete)
-  local cmds23=(acs site get)
-  local cmds24=(acs site list)
-  local cmds25=(acs site update)
-  local cmds26=(acs site container get)
-  local cmds27=(acs site container list)
-  local cmds28=(acs site member create)
-  local cmds29=(acs site member delete)
-  local cmds30=(acs site member get)
-  local cmds31=(acs site member list)
-  local cmds32=(acs site member update)
-  local cmds33=(acs search cmis)
-  local cmds34=(acs search fts)
-  local cmds35=(acs search sql)
-  local cmds36=(ags securityMark)
-  local cmds37=(ags securityMark list)
-  local cmds38=(ags securityMark update)
+  local cmds9=(acs node create)
+  local cmds10=(acs node get)
+  local cmds11=(acs person group)
+  local cmds12=(acs person site)
+  local cmds13=(acs person create)
+  local cmds14=(acs person get)
+  local cmds15=(acs person list)
+  local cmds16=(acs person update)
+  local cmds17=(acs person group list)
+  local cmds18=(acs person site delete)
+  local cmds19=(acs person site get)
+  local cmds20=(acs person site list)
+  local cmds21=(acs group member)
+  local cmds22=(acs group create)
+  local cmds23=(acs group delete)
+  local cmds24=(acs group get)
+  local cmds25=(acs group list)
+  local cmds26=(acs group update)
+  local cmds27=(acs group member create)
+  local cmds28=(acs group member delete)
+  local cmds29=(acs group member list)
+  local cmds30=(acs site container)
+  local cmds31=(acs site member)
+  local cmds32=(acs site create)
+  local cmds33=(acs site delete)
+  local cmds34=(acs site get)
+  local cmds35=(acs site list)
+  local cmds36=(acs site update)
+  local cmds37=(acs site container get)
+  local cmds38=(acs site container list)
+  local cmds39=(acs site member create)
+  local cmds40=(acs site member delete)
+  local cmds41=(acs site member get)
+  local cmds42=(acs site member list)
+  local cmds43=(acs site member update)
+  local cmds44=(acs search cmis)
+  local cmds45=(acs search fts)
+  local cmds46=(acs search sql)
+  local cmds47=(ags securityMark)
+  local cmds48=(ags securityMark list)
+  local cmds49=(ags securityMark update)
 
-  if CompWordsContainsArray "${cmds38[@]}"; then _picocli_alfresco_ags_securityMark_update; return $?; fi
-  if CompWordsContainsArray "${cmds37[@]}"; then _picocli_alfresco_ags_securityMark_list; return $?; fi
-  if CompWordsContainsArray "${cmds36[@]}"; then _picocli_alfresco_ags_securityMark; return $?; fi
-  if CompWordsContainsArray "${cmds35[@]}"; then _picocli_alfresco_acs_search_sql; return $?; fi
-  if CompWordsContainsArray "${cmds34[@]}"; then _picocli_alfresco_acs_search_fts; return $?; fi
-  if CompWordsContainsArray "${cmds33[@]}"; then _picocli_alfresco_acs_search_cmis; return $?; fi
-  if CompWordsContainsArray "${cmds32[@]}"; then _picocli_alfresco_acs_site_member_update; return $?; fi
-  if CompWordsContainsArray "${cmds31[@]}"; then _picocli_alfresco_acs_site_member_list; return $?; fi
-  if CompWordsContainsArray "${cmds30[@]}"; then _picocli_alfresco_acs_site_member_get; return $?; fi
-  if CompWordsContainsArray "${cmds29[@]}"; then _picocli_alfresco_acs_site_member_delete; return $?; fi
-  if CompWordsContainsArray "${cmds28[@]}"; then _picocli_alfresco_acs_site_member_create; return $?; fi
-  if CompWordsContainsArray "${cmds27[@]}"; then _picocli_alfresco_acs_site_container_list; return $?; fi
-  if CompWordsContainsArray "${cmds26[@]}"; then _picocli_alfresco_acs_site_container_get; return $?; fi
-  if CompWordsContainsArray "${cmds25[@]}"; then _picocli_alfresco_acs_site_update; return $?; fi
-  if CompWordsContainsArray "${cmds24[@]}"; then _picocli_alfresco_acs_site_list; return $?; fi
-  if CompWordsContainsArray "${cmds23[@]}"; then _picocli_alfresco_acs_site_get; return $?; fi
-  if CompWordsContainsArray "${cmds22[@]}"; then _picocli_alfresco_acs_site_delete; return $?; fi
-  if CompWordsContainsArray "${cmds21[@]}"; then _picocli_alfresco_acs_site_create; return $?; fi
-  if CompWordsContainsArray "${cmds20[@]}"; then _picocli_alfresco_acs_site_member; return $?; fi
-  if CompWordsContainsArray "${cmds19[@]}"; then _picocli_alfresco_acs_site_container; return $?; fi
-  if CompWordsContainsArray "${cmds18[@]}"; then _picocli_alfresco_acs_group_member_list; return $?; fi
-  if CompWordsContainsArray "${cmds17[@]}"; then _picocli_alfresco_acs_group_member_delete; return $?; fi
-  if CompWordsContainsArray "${cmds16[@]}"; then _picocli_alfresco_acs_group_member_create; return $?; fi
-  if CompWordsContainsArray "${cmds15[@]}"; then _picocli_alfresco_acs_group_update; return $?; fi
-  if CompWordsContainsArray "${cmds14[@]}"; then _picocli_alfresco_acs_group_list; return $?; fi
-  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_alfresco_acs_group_get; return $?; fi
-  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_alfresco_acs_group_delete; return $?; fi
-  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_alfresco_acs_group_create; return $?; fi
-  if CompWordsContainsArray "${cmds10[@]}"; then _picocli_alfresco_acs_group_member; return $?; fi
-  if CompWordsContainsArray "${cmds9[@]}"; then _picocli_alfresco_acs_person_list; return $?; fi
+  if CompWordsContainsArray "${cmds49[@]}"; then _picocli_alfresco_ags_securityMark_update; return $?; fi
+  if CompWordsContainsArray "${cmds48[@]}"; then _picocli_alfresco_ags_securityMark_list; return $?; fi
+  if CompWordsContainsArray "${cmds47[@]}"; then _picocli_alfresco_ags_securityMark; return $?; fi
+  if CompWordsContainsArray "${cmds46[@]}"; then _picocli_alfresco_acs_search_sql; return $?; fi
+  if CompWordsContainsArray "${cmds45[@]}"; then _picocli_alfresco_acs_search_fts; return $?; fi
+  if CompWordsContainsArray "${cmds44[@]}"; then _picocli_alfresco_acs_search_cmis; return $?; fi
+  if CompWordsContainsArray "${cmds43[@]}"; then _picocli_alfresco_acs_site_member_update; return $?; fi
+  if CompWordsContainsArray "${cmds42[@]}"; then _picocli_alfresco_acs_site_member_list; return $?; fi
+  if CompWordsContainsArray "${cmds41[@]}"; then _picocli_alfresco_acs_site_member_get; return $?; fi
+  if CompWordsContainsArray "${cmds40[@]}"; then _picocli_alfresco_acs_site_member_delete; return $?; fi
+  if CompWordsContainsArray "${cmds39[@]}"; then _picocli_alfresco_acs_site_member_create; return $?; fi
+  if CompWordsContainsArray "${cmds38[@]}"; then _picocli_alfresco_acs_site_container_list; return $?; fi
+  if CompWordsContainsArray "${cmds37[@]}"; then _picocli_alfresco_acs_site_container_get; return $?; fi
+  if CompWordsContainsArray "${cmds36[@]}"; then _picocli_alfresco_acs_site_update; return $?; fi
+  if CompWordsContainsArray "${cmds35[@]}"; then _picocli_alfresco_acs_site_list; return $?; fi
+  if CompWordsContainsArray "${cmds34[@]}"; then _picocli_alfresco_acs_site_get; return $?; fi
+  if CompWordsContainsArray "${cmds33[@]}"; then _picocli_alfresco_acs_site_delete; return $?; fi
+  if CompWordsContainsArray "${cmds32[@]}"; then _picocli_alfresco_acs_site_create; return $?; fi
+  if CompWordsContainsArray "${cmds31[@]}"; then _picocli_alfresco_acs_site_member; return $?; fi
+  if CompWordsContainsArray "${cmds30[@]}"; then _picocli_alfresco_acs_site_container; return $?; fi
+  if CompWordsContainsArray "${cmds29[@]}"; then _picocli_alfresco_acs_group_member_list; return $?; fi
+  if CompWordsContainsArray "${cmds28[@]}"; then _picocli_alfresco_acs_group_member_delete; return $?; fi
+  if CompWordsContainsArray "${cmds27[@]}"; then _picocli_alfresco_acs_group_member_create; return $?; fi
+  if CompWordsContainsArray "${cmds26[@]}"; then _picocli_alfresco_acs_group_update; return $?; fi
+  if CompWordsContainsArray "${cmds25[@]}"; then _picocli_alfresco_acs_group_list; return $?; fi
+  if CompWordsContainsArray "${cmds24[@]}"; then _picocli_alfresco_acs_group_get; return $?; fi
+  if CompWordsContainsArray "${cmds23[@]}"; then _picocli_alfresco_acs_group_delete; return $?; fi
+  if CompWordsContainsArray "${cmds22[@]}"; then _picocli_alfresco_acs_group_create; return $?; fi
+  if CompWordsContainsArray "${cmds21[@]}"; then _picocli_alfresco_acs_group_member; return $?; fi
+  if CompWordsContainsArray "${cmds20[@]}"; then _picocli_alfresco_acs_person_site_list; return $?; fi
+  if CompWordsContainsArray "${cmds19[@]}"; then _picocli_alfresco_acs_person_site_get; return $?; fi
+  if CompWordsContainsArray "${cmds18[@]}"; then _picocli_alfresco_acs_person_site_delete; return $?; fi
+  if CompWordsContainsArray "${cmds17[@]}"; then _picocli_alfresco_acs_person_group_list; return $?; fi
+  if CompWordsContainsArray "${cmds16[@]}"; then _picocli_alfresco_acs_person_update; return $?; fi
+  if CompWordsContainsArray "${cmds15[@]}"; then _picocli_alfresco_acs_person_list; return $?; fi
+  if CompWordsContainsArray "${cmds14[@]}"; then _picocli_alfresco_acs_person_get; return $?; fi
+  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_alfresco_acs_person_create; return $?; fi
+  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_alfresco_acs_person_site; return $?; fi
+  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_alfresco_acs_person_group; return $?; fi
+  if CompWordsContainsArray "${cmds10[@]}"; then _picocli_alfresco_acs_node_get; return $?; fi
+  if CompWordsContainsArray "${cmds9[@]}"; then _picocli_alfresco_acs_node_create; return $?; fi
   if CompWordsContainsArray "${cmds8[@]}"; then _picocli_alfresco_acs_node_update; return $?; fi
-  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_alfresco_acs_node_create; return $?; fi
+  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_alfresco_acs_node_list; return $?; fi
   if CompWordsContainsArray "${cmds6[@]}"; then _picocli_alfresco_acs_search; return $?; fi
   if CompWordsContainsArray "${cmds5[@]}"; then _picocli_alfresco_acs_site; return $?; fi
   if CompWordsContainsArray "${cmds4[@]}"; then _picocli_alfresco_acs_group; return $?; fi
@@ -255,7 +277,7 @@ function _picocli_alfresco_acs_node() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="create update"
+  local commands="list update create get"
   local flag_opts="-h --help -V --version"
   local arg_opts=""
 
@@ -271,10 +293,19 @@ function _picocli_alfresco_acs_node() {
 function _picocli_alfresco_acs_person() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
-  local commands="list"
+  local commands="group site create get list update"
   local flag_opts="-h --help -V --version"
-  local arg_opts=""
+  local arg_opts="-f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -f|--format)
+      return
+      ;;
+  esac
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -288,10 +319,19 @@ function _picocli_alfresco_acs_person() {
 function _picocli_alfresco_acs_group() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands="member create delete get list update"
   local flag_opts="-h --help -V --version"
-  local arg_opts=""
+  local arg_opts="-f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -f|--format)
+      return
+      ;;
+  esac
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -335,40 +375,35 @@ function _picocli_alfresco_acs_search() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `create` subcommand.
-function _picocli_alfresco_acs_node_create() {
+# Generates completions for the options and subcommands of the `list` subcommand.
+function _picocli_alfresco_acs_node_list() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-v --major-version -h --help -V --version"
-  local arg_opts="-t --type -n --name -p --parent -s --source -c --comment -a --aspects -m --metadata"
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-p --parent -f --format -w --where -sc --skip-count -max --max-items -ob --order-by"
 
   compopt +o default
 
   case ${prev_word} in
-    -t|--type)
-      return
-      ;;
-    -n|--name)
-      return
-      ;;
     -p|--parent)
       return
       ;;
-    -s|--source)
-      compopt -o filenames
-      COMPREPLY=( $( compgen -f -- "${curr_word}" ) ) # files
-      return $?
-      ;;
-    -c|--comment)
+    -f|--format)
       return
       ;;
-    -a|--aspects)
+    -w|--where)
       return
       ;;
-    -m|--metadata)
+    -sc|--skip-count)
+      return
+      ;;
+    -max|--max-items)
+      return
+      ;;
+    -ob|--order-by)
       return
       ;;
   esac
@@ -389,18 +424,21 @@ function _picocli_alfresco_acs_node_update() {
 
   local commands=""
   local flag_opts="-v --major-version -h --help -V --version"
-  local arg_opts="-t --type -n --name -p --parent -s --source -c --comment -a --aspects -m --metadata"
+  local arg_opts="-p --parent -f --format -t --type -n --name -s --source -a --aspects -m --metadata -c --comment"
 
   compopt +o default
 
   case ${prev_word} in
+    -p|--parent)
+      return
+      ;;
+    -f|--format)
+      return
+      ;;
     -t|--type)
       return
       ;;
     -n|--name)
-      return
-      ;;
-    -p|--parent)
       return
       ;;
     -s|--source)
@@ -408,8 +446,54 @@ function _picocli_alfresco_acs_node_update() {
       COMPREPLY=( $( compgen -f -- "${curr_word}" ) ) # files
       return $?
       ;;
+    -a|--aspects)
+      return
+      ;;
+    -m|--metadata)
+      return
+      ;;
     -c|--comment)
       return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `create` subcommand.
+function _picocli_alfresco_acs_node_create() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-p --parent -f --format -t --type -n --name -s --source -a --aspects -m --metadata"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -p|--parent)
+      return
+      ;;
+    -f|--format)
+      return
+      ;;
+    -t|--type)
+      return
+      ;;
+    -n|--name)
+      return
+      ;;
+    -s|--source)
+      compopt -o filenames
+      COMPREPLY=( $( compgen -f -- "${curr_word}" ) ) # files
+      return $?
       ;;
     -a|--aspects)
       return
@@ -427,8 +511,124 @@ function _picocli_alfresco_acs_node_update() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `list` subcommand.
-function _picocli_alfresco_acs_person_list() {
+# Generates completions for the options and subcommands of the `get` subcommand.
+function _picocli_alfresco_acs_node_get() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-p --parent -f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -p|--parent)
+      return
+      ;;
+    -f|--format)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `group` subcommand.
+function _picocli_alfresco_acs_person_group() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands="list"
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -f|--format)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `site` subcommand.
+function _picocli_alfresco_acs_person_site() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands="delete get list"
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -f|--format)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `create` subcommand.
+function _picocli_alfresco_acs_person_create() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-fn --first-name -ln --last-name -e --email -p --password"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -fn|--first-name)
+      return
+      ;;
+    -ln|--last-name)
+      return
+      ;;
+    -e|--email)
+      return
+      ;;
+    -p|--password)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `get` subcommand.
+function _picocli_alfresco_acs_person_get() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
@@ -444,14 +644,185 @@ function _picocli_alfresco_acs_person_list() {
   fi
 }
 
+# Generates completions for the options and subcommands of the `list` subcommand.
+function _picocli_alfresco_acs_person_list() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-sc --skip-count -mi --max-items"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -sc|--skip-count)
+      return
+      ;;
+    -mi|--max-items)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `update` subcommand.
+function _picocli_alfresco_acs_person_update() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-fn --first-name -ln --last-name -e --email -p --password"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -fn|--first-name)
+      return
+      ;;
+    -ln|--last-name)
+      return
+      ;;
+    -e|--email)
+      return
+      ;;
+    -p|--password)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `list` subcommand.
+function _picocli_alfresco_acs_person_group_list() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-sc --skip-count -mi --max-items -w --where"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -sc|--skip-count)
+      return
+      ;;
+    -mi|--max-items)
+      return
+      ;;
+    -w|--where)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `delete` subcommand.
+function _picocli_alfresco_acs_person_site_delete() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts=""
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `get` subcommand.
+function _picocli_alfresco_acs_person_site_get() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts=""
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `list` subcommand.
+function _picocli_alfresco_acs_person_site_list() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-h --help -V --version"
+  local arg_opts="-sc --skip-count -mi --max-items -w --where"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -sc|--skip-count)
+      return
+      ;;
+    -mi|--max-items)
+      return
+      ;;
+    -w|--where)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
 # Generates completions for the options and subcommands of the `member` subcommand.
 function _picocli_alfresco_acs_group_member() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands="create delete list"
   local flag_opts="-h --help -V --version"
-  local arg_opts=""
+  local arg_opts="-f --format"
+
+  compopt +o default
+
+  case ${prev_word} in
+    -f|--format)
+      return
+      ;;
+  esac
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -469,14 +840,11 @@ function _picocli_alfresco_acs_group_create() {
 
   local commands=""
   local flag_opts="-h --help -V --version"
-  local arg_opts="-id --id -dn --displayName -pi --parentIds"
+  local arg_opts="-dn --displayName -pi --parentIds"
 
   compopt +o default
 
   case ${prev_word} in
-    -id|--id)
-      return
-      ;;
     -dn|--displayName)
       return
       ;;

@@ -140,10 +140,13 @@ public class PersonCommand {
     }
 
     @Command(name = "group", description = "Person groups commands.")
-    public class PersonGroupCommand {
+    static class PersonGroupCommand {
 
         @Autowired
         GroupsApi groupsApi;
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
 
         @Command(description = "Get person groups list.")
         public Integer list(@Parameters(description = "Id of the Person") String id,
@@ -163,10 +166,13 @@ public class PersonCommand {
     }
 
     @Command(name = "site", description = "Person sites commands.")
-    public class PersonSiteCommand {
+    static class PersonSiteCommand {
 
         @Autowired
         SitesApi sitesApi;
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
 
         @Command(description = "Get person sites list.")
         public Integer list(@Parameters(description = "Id of the Person") String id,
