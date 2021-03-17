@@ -55,7 +55,7 @@ public class SearchCommand {
 
     @Component
     @Command(name = "cmis")
-    class CmisQueryCommand extends AbstractSearchCommand {
+    static class CmisQueryCommand extends AbstractSearchCommand {
 
         @Override
         public Integer call() {
@@ -68,7 +68,7 @@ public class SearchCommand {
 
     @Component
     @Command(name = "fts")
-    class FtsQueryCommand extends AbstractSearchCommand {
+    static class FtsQueryCommand extends AbstractSearchCommand {
 
         @Override
         public Integer call() throws Exception {
@@ -81,7 +81,7 @@ public class SearchCommand {
 
     @Component
     @Command(name = "sql")
-    class SqlQueryCommand implements Callable<Integer> {
+    static class SqlQueryCommand implements Callable<Integer> {
 
         @Autowired
         private SqlApi sqlApi;

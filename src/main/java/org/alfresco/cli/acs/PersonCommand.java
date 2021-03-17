@@ -20,12 +20,13 @@ import picocli.CommandLine.Command;
 @Command(name = "person", subcommands = {ListCommand.class})
 public class PersonCommand {
 
-  @Autowired
-  private PeopleApi peopleApi;
-
   @Component
   @Command(name = "list")
-  class ListCommand implements Callable<Integer> {
+  static class ListCommand implements Callable<Integer> {
+
+      @Autowired
+      private PeopleApi peopleApi;
+
 
     @Override
     public Integer call() {

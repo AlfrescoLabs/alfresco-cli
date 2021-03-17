@@ -89,9 +89,13 @@ public class GroupCommand {
         return 0;
     }
 
+    @Component
     @Command(name = "member", description = "List, create and delete group members.")
-    class GroupMemberCommand {
-        
+    static class GroupMemberCommand {
+
+        @Autowired
+        private GroupsApi groupsApi;
+
         @Command(description = "List group members.")
         public Integer list(@Parameters(description = "Group identifier") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",

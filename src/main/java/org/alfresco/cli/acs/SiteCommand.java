@@ -88,8 +88,12 @@ public class SiteCommand {
         return 0;
     }
 
+    @Component
     @Command(name = "container", description = "Site container commands.")
-    public class SiteContainerCommand {
+    static class SiteContainerCommand {
+
+        @Autowired
+        SitesApi sitesApi;
 
         @Command(description = "Get site container list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
@@ -114,8 +118,12 @@ public class SiteCommand {
         }
     }
 
+    @Component
     @Command(name = "member", description = "Site members commands.")
-    public class SiteMemberCommand {
+    static class SiteMemberCommand {
+
+        @Autowired
+        SitesApi sitesApi;
 
         @Command(description = "Get site members list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
