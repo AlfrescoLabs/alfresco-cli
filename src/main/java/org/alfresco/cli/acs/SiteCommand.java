@@ -6,11 +6,25 @@ import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.SitesApi;
-import org.alfresco.core.model.*;
+import org.alfresco.core.model.Site;
+import org.alfresco.core.model.SiteBodyCreate;
+import org.alfresco.core.model.SiteBodyUpdate;
+import org.alfresco.core.model.SiteContainer;
+import org.alfresco.core.model.SiteContainerEntry;
+import org.alfresco.core.model.SiteContainerPagingList;
+import org.alfresco.core.model.SiteEntry;
+import org.alfresco.core.model.SiteMember;
+import org.alfresco.core.model.SiteMemberPagingList;
+import org.alfresco.core.model.SiteMembershipBodyCreate;
+import org.alfresco.core.model.SiteMembershipBodyUpdate;
+import org.alfresco.core.model.SitePagingList;
+import org.alfresco.core.model.SiteRole;
+import org.alfresco.core.model.SiteRoleEntry;
+import org.alfresco.core.model.SiteRolePagingList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -22,7 +36,7 @@ public class SiteCommand {
     @Autowired
     SitesApi sitesApi;
 
-    @CommandLine.Mixin
+    @Mixin
     FormatProviderRegistry formatProvider;
 
     @Command(description = "Get site list.")
@@ -91,6 +105,9 @@ public class SiteCommand {
         @Autowired
         SitesApi sitesApi;
 
+        @Mixin
+        FormatProviderRegistry formatProvider;
+
         @Command(description = "Get site container list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
@@ -119,6 +136,9 @@ public class SiteCommand {
 
         @Autowired
         SitesApi sitesApi;
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
 
         @Command(description = "Get site members list.")
         public Integer list(@Parameters(description = "Id of the Site") String id,
