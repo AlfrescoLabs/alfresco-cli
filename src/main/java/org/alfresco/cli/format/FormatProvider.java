@@ -10,6 +10,8 @@ package org.alfresco.cli.format;
 public interface FormatProvider {
 
     public static final String DEFAULT = "default";
+    public static final String ID = "id";
+    public static final String TO_STRING = "toString";
 
     void print(Object item);
 

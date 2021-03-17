@@ -215,6 +215,21 @@ public class SiteCommand {
     }
 
     @Component
+    static class SiteIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Site site = (Site) item;
+            System.out.printf(site.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && Site.class == itemClass;
+        }
+    }
+
+    @Component
     static class SitePagingListProvider implements FormatProvider {
 
         @Override
@@ -238,6 +253,26 @@ public class SiteCommand {
         }
     }
 
+
+    @Component
+    static class SitePagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SitePagingList siteList = (SitePagingList) item;
+            List<SiteEntry> entries = siteList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SitePagingList.class == itemClass;
+        }
+    }
+
     @Component
     static class SiteContainerProvider implements FormatProvider {
 
@@ -256,6 +291,21 @@ public class SiteCommand {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return DEFAULT.equals(format) && SiteContainer.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteContainerIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteContainer siteContainer = (SiteContainer) item;
+            System.out.println(siteContainer.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteContainer.class == itemClass;
         }
     }
 
@@ -284,6 +334,25 @@ public class SiteCommand {
     }
 
     @Component
+    static class SiteContainerPagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteContainerPagingList siteContainerList = (SiteContainerPagingList) item;
+            List<SiteContainerEntry> entries = siteContainerList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteContainerPagingList.class == itemClass;
+        }
+    }
+
+    @Component
     static class SiteRoleProvider implements FormatProvider {
 
         @Override
@@ -301,6 +370,21 @@ public class SiteCommand {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return DEFAULT.equals(format) && SiteRole.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteRoleIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteRole siteRole = (SiteRole) item;
+            System.out.printf(siteRole.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteRole.class == itemClass;
         }
     }
 
@@ -328,4 +412,22 @@ public class SiteCommand {
         }
     }
 
+    @Component
+    static class SiteRolePagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteRolePagingList siteRoleList = (SiteRolePagingList) item;
+            List<SiteRoleEntry> entries = siteRoleList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteRolePagingList.class == itemClass;
+        }
+    }
 }

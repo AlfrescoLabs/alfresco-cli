@@ -34,7 +34,7 @@ import picocli.CommandLine.Mixin;
 
 @Component
 @Command(name = "node", mixinStandardHelpOptions = true,
-        subcommands = {NodesCommand.ListNodeCommand.class, NodesCommand.UpdateNodeCommand.class, NodesCommand.CreateNodeCommand.class, NodesCommand.GetNodeCommand.class},
+        subcommands = {NodesCommand.ListNodeCommand.class, NodesCommand.UpdateNodeCommand.class, NodesCommand.CreateNodeCommand.class, NodesCommand.GetNodeCommand.class, NodesCommand.DeleteNodeCommand.class},
         exitCodeOnExecutionException = 34)
 public class NodesCommand implements Callable<Integer> {
 
@@ -46,6 +46,25 @@ public class NodesCommand implements Callable<Integer> {
     public Integer call() {
         System.out.printf("Use -h for available subcommands.");
         return 1;
+    }
+
+    @Component
+    @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
+    static class DeleteNodeCommand extends AbstractNodesCommand {
+
+        @Parameters(index = "0", description = "The id or relative path of the node to be deleted.")
+        private String node;
+
+        @Option(names = {"-pe", "--permanent"}, description = "Deletes the node permanently instead of moving it to the trashcan. Only the owner of the node can use this option")
+        Boolean permanent = null;
+
+        @Override
+        public Integer call() {
+            final String nodeId = getNodeId(node);
+            nodesApi.deleteNode(nodeId, permanent);
+            formatProvider.print(nodeId);
+            return 0;
+        }
     }
 
     @Component
@@ -228,6 +247,21 @@ public class NodesCommand implements Callable<Integer> {
     }
 
     @Component
+    static class NodeIdFormatProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Node node = (Node)item;
+            System.out.printf(node.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && Node.class == itemClass;
+        }
+    }
+
+    @Component
     static class NodeChildAssociationPagingListFormatProvider implements FormatProvider {
 
         @Override
@@ -248,6 +282,25 @@ public class NodesCommand implements Callable<Integer> {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return DEFAULT.equals(format) && NodeChildAssociationPagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class NodeChildAssociationPagingListIdsFormatProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList)item;
+            List<NodeChildAssociationEntry> entries = ncaList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && NodeChildAssociationPagingList.class == itemClass;
         }
     }
 }

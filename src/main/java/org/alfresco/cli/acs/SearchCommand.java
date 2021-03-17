@@ -94,6 +94,25 @@ public class SearchCommand {
     }
 
     @Component
+    static class ResultSetPagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final ResultSetPagingList resultSetList = (ResultSetPagingList) item;
+            List<ResultSetRowEntry> entries = resultSetList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && ResultSetPagingList.class == itemClass;
+        }
+    }
+
+    @Component
     static class SQLResultSetPagingListProvider implements FormatProvider {
 
         @Override
@@ -116,5 +135,4 @@ public class SearchCommand {
             return DEFAULT.equals(format) && SQLResultSetPagingList.class == itemClass;
         }
     }
-
 }

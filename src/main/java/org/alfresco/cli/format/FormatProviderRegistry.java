@@ -20,7 +20,6 @@ public class FormatProviderRegistry {
     List<FormatProvider> providers = Collections.emptyList();
 
     public void print(Object item) {
-
         if (item != null) {
             FormatProvider provider = providers.stream()
                     .filter(prv -> prv.isApplicable(item.getClass(), format))
@@ -29,6 +28,5 @@ public class FormatProviderRegistry {
 
             provider.print(item);
         }
-
     }
 }

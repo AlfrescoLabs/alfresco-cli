@@ -153,6 +153,21 @@ public class GroupCommand {
     }
 
     @Component
+    static class GroupIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Group group = (Group) item;
+            System.out.printf(group.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && Group.class == itemClass;
+        }
+    }
+
+    @Component
     static class GroupPagingListProvider implements FormatProvider {
 
         @Override
@@ -177,6 +192,25 @@ public class GroupCommand {
     }
 
     @Component
+    static class GroupPagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupPagingList groupList = (GroupPagingList) item;
+            List<GroupEntry> entries = groupList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && GroupPagingList.class == itemClass;
+        }
+    }
+
+    @Component
     static class GroupMemberProvider implements FormatProvider {
 
         @Override
@@ -194,6 +228,21 @@ public class GroupCommand {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return DEFAULT.equals(format) && GroupMember.class == itemClass;
+        }
+    }
+
+    @Component
+    static class GroupMemberIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupMember groupMember = (GroupMember) item;
+            System.out.printf(groupMember.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && GroupMember.class == itemClass;
         }
     }
 
@@ -221,4 +270,22 @@ public class GroupCommand {
         }
     }
 
+    @Component
+    static class GroupMemberPagingListIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupMemberPagingList groupMemberList = (GroupMemberPagingList) item;
+            List<GroupMemberEntry> entries = groupMemberList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && GroupMemberPagingList.class == itemClass;
+        }
+    }
 }

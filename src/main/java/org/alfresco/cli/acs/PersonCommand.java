@@ -116,6 +116,21 @@ public class PersonCommand {
     }
 
     @Component
+    static class PersonIdFormatProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Person person = (Person) item;
+            System.out.printf(person.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && Person.class == itemClass;
+        }
+    }
+
+    @Component
     static class PersonPagingListFormatProvider implements FormatProvider {
 
         @Override
@@ -136,6 +151,25 @@ public class PersonCommand {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return DEFAULT.equals(format) && PersonPagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class PersonPagingListIdsFormatProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final PersonPagingList personList = (PersonPagingList) item;
+            List<PersonEntry> entries = personList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && PersonPagingList.class == itemClass;
         }
     }
 
