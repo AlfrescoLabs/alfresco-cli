@@ -3,18 +3,9 @@ package org.alfresco.cli.acs;
 import java.util.List;
 import org.alfresco.cli.acs.SiteCommand.SiteContainerCommand;
 import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
+import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.core.handler.SitesApi;
-import org.alfresco.core.model.Site;
-import org.alfresco.core.model.SiteBodyCreate;
-import org.alfresco.core.model.SiteBodyUpdate;
-import org.alfresco.core.model.SiteContainer;
-import org.alfresco.core.model.SiteContainerEntry;
-import org.alfresco.core.model.SiteEntry;
-import org.alfresco.core.model.SiteMember;
-import org.alfresco.core.model.SiteMemberEntry;
-import org.alfresco.core.model.SiteMembershipBodyCreate;
-import org.alfresco.core.model.SiteMembershipBodyUpdate;
-import org.alfresco.core.model.SiteRole;
+import org.alfresco.core.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -170,5 +161,50 @@ public class SiteCommand {
     }
 
     // TODO Add "/sites/{siteId}/group-members" when endpoints are available in SDK
+
+    @Component
+    static class SiteRoleProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteRole siteRole = (SiteRole) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-20s %-20s", siteRole.getId(), siteRole.getRole(), siteRole.getSite().getVisibility());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteRole.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteRolePagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteRolePagingList siteRoleList = (SiteRolePagingList) item;
+            List<SiteRoleEntry> entries = siteRoleList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-20s %-20s %-20s", entry.getId(), entry.getRole(), entry.getSite().getVisibility());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteRolePagingList.class == itemClass;
+        }
+    }
 
 }

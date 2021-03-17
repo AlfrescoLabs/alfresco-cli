@@ -8,16 +8,10 @@ package org.alfresco.cli.acs;
 
 import java.util.List;
 import org.alfresco.cli.acs.GroupCommand.GroupMemberCommand;
+import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.core.handler.GroupsApi;
-import org.alfresco.core.model.Group;
-import org.alfresco.core.model.GroupBodyCreate;
-import org.alfresco.core.model.GroupBodyUpdate;
-import org.alfresco.core.model.GroupEntry;
-import org.alfresco.core.model.GroupMember;
-import org.alfresco.core.model.GroupMemberEntry;
-import org.alfresco.core.model.GroupMembershipBodyCreate;
+import org.alfresco.core.model.*;
 import org.alfresco.core.model.GroupMembershipBodyCreate.MemberTypeEnum;
-import org.alfresco.core.model.GroupPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -124,6 +118,51 @@ public class GroupCommand {
             groupsApi.deleteGroupMembership(id, personId);
             System.out.println(personId);
             return 0;
+        }
+    }
+
+    @Component
+    static class GroupProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Group group = (Group) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-80s", "ID", "DISPLAY", "PARENTS");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-80s", group.getId(), group.getDisplayName(), (group.getParentIds() == null ? "" : group.getParentIds()));
+            System.out.println();
+        System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && Group.class == itemClass;
+        }
+    }
+
+    @Component
+    static class GroupPagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupPagingList groupList = (GroupPagingList) item;
+            List<GroupEntry> entries = groupList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-80s", "ID", "DISPLAY", "PARENTS");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-40s %-40s %-80s", entry.getId(), entry.getDisplayName(), (entry.getParentIds() == null ? "" : entry.getParentIds()));
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && GroupPagingList.class == itemClass;
         }
     }
 }

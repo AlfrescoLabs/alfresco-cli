@@ -21,11 +21,14 @@ public class FormatProviderRegistry {
 
     public void print(Object item) {
 
-        FormatProvider provider = providers.stream()
-                .filter(prv -> prv.isApplicable(item.getClass(), format))
-                .findFirst()
-                .orElse(elem -> System.out.println(elem));
+        if (item != null) {
+            FormatProvider provider = providers.stream()
+                    .filter(prv -> prv.isApplicable(item.getClass(), format))
+                    .findFirst()
+                    .orElse(elem -> System.out.println(elem));
 
-        provider.print(item);
+            provider.print(item);
+        }
+
     }
 }
