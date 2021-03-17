@@ -8,6 +8,7 @@ package org.alfresco.cli;
 
 import org.alfresco.cli.acs.AcsCommand;
 import org.alfresco.cli.ags.AgsCommand;
+import org.alfresco.cli.apa.ApaCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ScopeType;
@@ -15,6 +16,22 @@ import picocli.CommandLine.ScopeType;
 @Component
 @Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 1, showDefaultValues = true, usageHelpAutoWidth = true,
-        version = "1.0", subcommands = { AcsCommand.class, AgsCommand.class })
+        version = "1.0", subcommands = {AcsCommand.class, AgsCommand.class, ApaCommand.class},
+        synopsisHeading = "    _   _  __                         _ _ \n"
+                + "   /_\\ | |/ _|_ _ ___ _____ ___    __| (_)\n"
+                + "  / _ \\| |  _| '_/ -_(_-/ _/ _ \\  / _| | |\n"
+                + " /_/ \\_|_|_| |_| \\___/__\\__\\___/  \\__|_|_|     powered by picoTeam\n\n"
+                + "Usage: ")
 public class AlfrescoCommand {
+
+    @Command(hidden = true)
+    public Integer win() throws InterruptedException {
+        System.out.println();
+        String s = "............................ Alfresco CLI for the win! ";
+        while (true) {
+            System.out.printf("\r%s", s.substring(0, 30));
+            Thread.sleep(100);
+            s = s.substring(1) + s.substring(0, 1);
+        }
+    }
 }

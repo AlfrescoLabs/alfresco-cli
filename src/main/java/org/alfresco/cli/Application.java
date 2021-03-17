@@ -10,13 +10,20 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
 
 @SpringBootApplication
+
+// Required for ApaCommand
+@EnableFeignClients({"org.alfresco.core.handler", "org.alfresco.discovery.handler",
+        "org.alfresco.governance.core.handler", "org.alfresco.governance.classification.handler",
+        "org.alfresco.search.handler", "org.alfresco.search.sql.handler",
+        "com.alfresco.activiti.runtime.handler"})
 public class Application implements CommandLineRunner, ExitCodeGenerator {
 
-    private IFactory factory;        
+    private IFactory factory;
     private int exitCode;
     private AlfrescoCommand mailCommand;
 
