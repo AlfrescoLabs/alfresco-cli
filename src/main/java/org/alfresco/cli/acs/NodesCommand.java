@@ -33,29 +33,25 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Mixin;
 
 @Component
-@Command(name = "node", mixinStandardHelpOptions = true,
-        subcommands = {NodesCommand.ListNodeCommand.class, NodesCommand.UpdateNodeCommand.class, NodesCommand.CreateNodeCommand.class, NodesCommand.GetNodeCommand.class, NodesCommand.DeleteNodeCommand.class},
-        exitCodeOnExecutionException = 34)
-public class NodesCommand implements Callable<Integer> {
+@Command(name = "node", description = "Node commands",
+        subcommands = {NodesCommand.ListNodeCommand.class, NodesCommand.UpdateNodeCommand.class,
+                NodesCommand.CreateNodeCommand.class, NodesCommand.GetNodeCommand.class,
+                NodesCommand.DeleteNodeCommand.class})
+public class NodesCommand {
 
     private static final String ROOT_PATH = "/";
     private static final String MY_ID = "-my-";
     private static final String ROOT_ID = "-root-";
 
-    @Override
-    public Integer call() {
-        System.out.printf("Use -h for available subcommands.");
-        return 1;
-    }
-
     @Component
     @Command(name = "delete", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
     static class DeleteNodeCommand extends AbstractNodesCommand {
 
-        @Parameters(index = "0", description = "The id or relative path of the node to be deleted.")
+        @Parameters(index = "0", description = "The id or relative path of the node to be deleted")
         private String node;
 
-        @Option(names = {"-pe", "--permanent"}, description = "Deletes the node permanently instead of moving it to the trashcan. Only the owner of the node can use this option")
+        @Option(names = {"-pe", "--permanent"},
+                description = "Deletes the node permanently instead of moving it to the trashcan. Only the owner of the node can use this option")
         Boolean permanent = null;
 
         @Override
@@ -71,13 +67,15 @@ public class NodesCommand implements Callable<Integer> {
     @Command(name = "get", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
     static class GetNodeCommand extends AbstractNodesCommand {
 
-        @Parameters(index = "0", description = "The id or relative path of the node to be retrieved.")
+        @Parameters(index = "0",
+                description = "The id or relative path of the node to be retrieved")
         private String node;
 
         @Override
         public Integer call() {
             final String nodeId = getNodeId(node);
-            final ResponseEntity<NodeEntry> responseEntity = nodesApi.getNode(nodeId, null, null, null);
+            final ResponseEntity<NodeEntry> responseEntity =
+                    nodesApi.getNode(nodeId, null, null, null);
             final Node node = responseEntity.getBody().getEntry();
             formatProvider.print(node);
             return 0;
@@ -88,22 +86,28 @@ public class NodesCommand implements Callable<Integer> {
     @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
     static class ListNodeCommand extends AbstractNodesCommand {
 
-        @Option(names = {"-w", "--where"}, description = "\"Optionally filter the list. Here are some examples:  *   -w \"(isFolder=true)\"  *   -w \"(isFile=true)\"  *   -w \"(nodeType='my:specialNodeType')\"  *   -w \"(nodeType='my:specialNodeType INCLUDESUBTYPES')\"  *   -w \"(isPrimary=true)\"  *   -w \"(assocType='my:specialAssocType')\"  *   -w \"(isPrimary=false and assocType='my:specialAssocType')\" ")
+        @Option(names = {"-w", "--where"},
+                description = "\"Optionally filter the list. Here are some examples:  *   -w \"(isFolder=true)\"  *   -w \"(isFile=true)\"  *   -w \"(nodeType='my:specialNodeType')\"  *   -w \"(nodeType='my:specialNodeType INCLUDESUBTYPES')\"  *   -w \"(isPrimary=true)\"  *   -w \"(assocType='my:specialAssocType')\"  *   -w \"(isPrimary=false and assocType='my:specialAssocType')\" ")
         String where = null;
 
-        @Option(names = {"-sc", "--skip-count"}, description = "The number of entities that exist in the collection before those included in this list.  If not supplied then the default value is 0.")
+        @Option(names = {"-sc", "--skip-count"},
+                description = "The number of entities that exist in the collection before those included in this list. (Default value is 0)")
         Integer skipCount = null;
 
-        @Option(names = {"-max", "--max-items"}, description = "The maximum number of items to return in the list.  If not supplied then the default value is 100.")
+        @Option(names = {"-max", "--max-items"},
+                description = "The maximum number of items to return in the list. (Default valueis 100)")
         Integer maxItems = null;
 
-        @Option(names = {"-ob", "--order-by"}, description = "A string to control the order of the entities returned in a list. You can use the **order-by** parameter to sort the list by one or more fields.  Each field has a default sort order, which is normally ascending order. To sort the entities in a specific order, you can use the **ASC** and **DESC** keywords for any field.")
+        @Option(names = {"-ob", "--order-by"},
+                description = "A string to control the order of the entities returned in a list. You can use the **order-by** parameter to sort the list by one or more fields.  Each field has a default sort order, which is normally ascending order. To sort the entities in a specific order, you can use the **ASC** and **DESC** keywords for any field.")
         List<String> orderBy = null;
 
         @Override
         public Integer call() {
             final String parentNodeId = getNodeId(parent);
-            final ResponseEntity<NodeChildAssociationPaging> responseEntity = nodesApi.listNodeChildren(parentNodeId, skipCount, maxItems, orderBy, where, null, null, null, null);
+            final ResponseEntity<NodeChildAssociationPaging> responseEntity =
+                    nodesApi.listNodeChildren(parentNodeId, skipCount, maxItems, orderBy, where,
+                            null, null, null, null);
             final NodeChildAssociationPagingList list = responseEntity.getBody().getList();
             formatProvider.print(list);
             return 0;
@@ -123,15 +127,15 @@ public class NodesCommand implements Callable<Integer> {
         }
 
         Node createNode() {
-            final String effectiveNodeType = contentType == null ? ContentModel.CM_CONTENT : contentType;
-            final String effectiveName = name != null ? name : source != null ? source.getName() : "unnamed";
-            final NodeBodyCreate nodeBodyCreate = new NodeBodyCreate()
-                    .nodeType(effectiveNodeType)
-                    .name(effectiveName)
-                    .properties(metadata)
-                    .aspectNames(aspects);
+            final String effectiveNodeType =
+                    contentType == null ? ContentModel.CM_CONTENT : contentType;
+            final String effectiveName =
+                    name != null ? name : source != null ? source.getName() : "unnamed";
+            final NodeBodyCreate nodeBodyCreate = new NodeBodyCreate().nodeType(effectiveNodeType)
+                    .name(effectiveName).properties(metadata).aspectNames(aspects);
 
-            ResponseEntity<NodeEntry> responseEntity = nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
+            ResponseEntity<NodeEntry> responseEntity =
+                    nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
             return responseEntity.getBody().getEntry();
         }
     }
@@ -140,13 +144,15 @@ public class NodesCommand implements Callable<Integer> {
     @Command(name = "update", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
     static class UpdateNodeCommand extends UpdatableNodesCommand {
 
-        @Parameters(index = "0", description = "The id or relative path of the node to be updated.")
+        @Parameters(index = "0", description = "The id or relative path of the node to be updated")
         private String node;
 
-        @Option(names = {"-v", "--major-version"}, description = "If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.")
+        @Option(names = {"-v", "--major-version"},
+                description = "If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.")
         Boolean majorVersion = null;
 
-        @Option(names = {"-c", "--comment"}, description = "Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.")
+        @Option(names = {"-c", "--comment"},
+                description = "Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.")
         String comment = null;
 
         @Override
@@ -155,21 +161,18 @@ public class NodesCommand implements Callable<Integer> {
             Optional<Node> updatedContent = updateNodeContent(nodeId, majorVersion, comment);
             Optional<Node> updatedMetadata = updateNodeMetadata(nodeId);
             formatProvider.print(updatedMetadata.orElse(
-                    updatedContent.orElseThrow(() -> new RuntimeException("Nothing to update"))
-            ));
+                    updatedContent.orElseThrow(() -> new RuntimeException("Nothing to update"))));
 
             return 0;
         }
 
         Optional<Node> updateNodeMetadata(String nodeId) {
             if (!metadata.isEmpty() || name != null || !aspects.isEmpty()) {
-                final NodeBodyUpdate nodeBodyUpdate = new NodeBodyUpdate()
-                        .nodeType(contentType)
-                        .properties(metadata)
-                        .aspectNames(aspects)
-                        .name(name);
+                final NodeBodyUpdate nodeBodyUpdate = new NodeBodyUpdate().nodeType(contentType)
+                        .properties(metadata).aspectNames(aspects).name(name);
 
-                ResponseEntity<NodeEntry> responseEntity = nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+                ResponseEntity<NodeEntry> responseEntity =
+                        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
                 return Optional.of(responseEntity.getBody().getEntry());
             } else {
                 return Optional.empty();
@@ -190,7 +193,8 @@ public class NodesCommand implements Callable<Integer> {
 
         String getNodeId(String path) {
             if (path.startsWith(ROOT_PATH)) {
-                ResponseEntity<NodeEntry> responseEntity = nodesApi.getNode(ROOT_ID, null, path, Collections.singletonList("id"));
+                ResponseEntity<NodeEntry> responseEntity =
+                        nodesApi.getNode(ROOT_ID, null, path, Collections.singletonList("id"));
                 return responseEntity.getBody().getEntry().getId();
             } else {
                 return path;
@@ -212,12 +216,16 @@ public class NodesCommand implements Callable<Integer> {
         @Option(names = {"-a", "--aspects"}, description = "One or more aspect times")
         List<String> aspects = Collections.emptyList();
 
-        @Option(names = {"-m", "--metadata"}, description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
+        @Option(names = {"-m", "--metadata"},
+                description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
         Map<String, String> metadata = Collections.emptyMap();
 
-        Optional<Node> updateNodeContent(String nodeId, Boolean majorVersion, String comment) throws IOException {
+        Optional<Node> updateNodeContent(String nodeId, Boolean majorVersion, String comment)
+                throws IOException {
             if (source != null) {
-                ResponseEntity<NodeEntry> responseEntity = nodesApi.updateNodeContent(nodeId, FileUtils.readFileToByteArray(source), majorVersion, comment, name, null, null);
+                ResponseEntity<NodeEntry> responseEntity =
+                        nodesApi.updateNodeContent(nodeId, FileUtils.readFileToByteArray(source),
+                                majorVersion, comment, name, null, null);
                 return Optional.of(responseEntity.getBody().getEntry());
             } else {
                 return Optional.empty();
@@ -230,14 +238,18 @@ public class NodesCommand implements Callable<Integer> {
 
         @Override
         public void print(Object item) {
-            final Node node = (Node)item;
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            final Node node = (Node) item;
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
             System.out.printf("%-40s %-30s %-25s %-10s", "ID", "NAME", "MODIFIED AT", "USER");
             System.out.println();
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("%-40s %-30s %-25s %-10s", node.getId(), node.getName(), node.getModifiedAt(), node.getModifiedByUser().getDisplayName());
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-30s %-25s %-10s", node.getId(), node.getName(),
+                    node.getModifiedAt(), node.getModifiedByUser().getDisplayName());
             System.out.println();
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
         }
 
         @Override
@@ -251,7 +263,7 @@ public class NodesCommand implements Callable<Integer> {
 
         @Override
         public void print(Object item) {
-            final Node node = (Node)item;
+            final Node node = (Node) item;
             System.out.printf(node.getId());
         }
 
@@ -266,17 +278,21 @@ public class NodesCommand implements Callable<Integer> {
 
         @Override
         public void print(Object item) {
-            final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList)item;
+            final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList) item;
             List<NodeChildAssociationEntry> entries = ncaList.getEntries();
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
             System.out.printf("%-40s %-30s %-25s %-10s", "ID", "NAME", "MODIFIED AT", "USER");
             System.out.println();
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
             entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
-                System.out.printf("%-40s %-30s %-25s %-10s", entry.getId(), entry.getName(), entry.getModifiedAt(), entry.getModifiedByUser().getDisplayName());
+                System.out.printf("%-40s %-30s %-25s %-10s", entry.getId(), entry.getName(),
+                        entry.getModifiedAt(), entry.getModifiedByUser().getDisplayName());
                 System.out.println();
             });
-            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println(
+                    "----------------------------------------------------------------------------------------------------------------------");
         }
 
         @Override
@@ -290,12 +306,10 @@ public class NodesCommand implements Callable<Integer> {
 
         @Override
         public void print(Object item) {
-            final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList)item;
+            final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList) item;
             List<NodeChildAssociationEntry> entries = ncaList.getEntries();
-            entries.stream()
-                    .map(entry -> entry.getEntry().getId())
-                    .reduce((e1, e2) -> e1 + ", " + e2)
-                    .ifPresent(System.out::printf);
+            entries.stream().map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2).ifPresent(System.out::printf);
         }
 
         @Override

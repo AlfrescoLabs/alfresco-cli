@@ -24,7 +24,7 @@ import picocli.CommandLine.Parameters;
 import java.util.List;
 
 @Component
-@Command(name = "person", subcommands = {PersonGroupCommand.class, PersonSiteCommand.class}, description = "People commands.")
+@Command(name = "person", subcommands = {PersonGroupCommand.class, PersonSiteCommand.class}, description = "Person commands")
 public class PersonCommand {
 
     @Autowired
@@ -33,7 +33,7 @@ public class PersonCommand {
     @Mixin
     FormatProviderRegistry formatProvider;
 
-    @Command(description = "Get people list.")
+    @Command(description = "Get people list")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                     description = "Number of items to be skipped") Integer skipCount,
@@ -45,7 +45,7 @@ public class PersonCommand {
         return 0;
     }
 
-    @Command(description = "Create person.")
+    @Command(description = "Create person")
     public Integer create(@Parameters(description = "Id of the Person") String id,
                           @Option(names = {"-fn", "--first-name"}, required = true,
                                   description = "First Name of the Person") String firstName,
@@ -67,14 +67,14 @@ public class PersonCommand {
         return 0;
     }
 
-    @Command(description = "Get person details.")
+    @Command(description = "Get person details")
     public Integer get(@Parameters(description = "Id of the Person") String id) {
         Person person = peopleApi.getPerson(id, null).getBody().getEntry();
         formatProvider.print(person);
         return 0;
     }
 
-    @Command(description = "Update person details.")
+    @Command(description = "Update person details")
     public Integer update(@Parameters(description = "Id of the Person") String id,
                           @Option(names = {"-fn", "--first-name"},
                                   description = "First Name of the Person") String firstName,
@@ -173,7 +173,7 @@ public class PersonCommand {
         }
     }
 
-    @Command(name = "group", description = "Person groups commands.")
+    @Command(name = "group", description = "Person groups commands")
     static class PersonGroupCommand {
 
         @Autowired
@@ -182,7 +182,7 @@ public class PersonCommand {
         @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "Get person groups list.")
+        @Command(description = "Get person groups list")
         public Integer list(@Parameters(description = "Id of the Person") String id,
                             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                                     description = "Number of items to be skipped") Integer skipCount,
@@ -199,7 +199,7 @@ public class PersonCommand {
 
     }
 
-    @Command(name = "site", description = "Person sites commands.")
+    @Command(name = "site", description = "Person sites commands")
     static class PersonSiteCommand {
 
         @Autowired
@@ -208,7 +208,7 @@ public class PersonCommand {
         @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "Get person sites list.")
+        @Command(description = "Get person sites list")
         public Integer list(@Parameters(description = "Id of the Person") String id,
                             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                                     description = "Number of items to be skipped") Integer skipCount,
@@ -223,7 +223,7 @@ public class PersonCommand {
             return 0;
         }
 
-        @Command(description = "Get person sites details.")
+        @Command(description = "Get person sites details")
         public Integer get(@Parameters(description = "Id of the Person") String personId,
                            @Parameters(description = "Id of the Site") String siteId) {
             SiteRole siteRole = sitesApi.getSiteMembershipForPerson(personId, siteId).getBody().getEntry();
@@ -231,7 +231,7 @@ public class PersonCommand {
             return 0;
         }
 
-        @Command(description = "Delete person site membership.")
+        @Command(description = "Delete person site membership")
         public Integer delete(@Parameters(description = "Id of the Person") String personId,
                            @Parameters(description = "Id of the Site") String siteId) {
             sitesApi.deleteSiteMembership(siteId, personId);

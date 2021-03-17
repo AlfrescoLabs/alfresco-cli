@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 @Component
-@Command(name = "acs", description = "Alfresco Content Services commands",
-subcommands = {NodesCommand.class,
-    PersonCommand.class, GroupCommand.class, SiteCommand.class, SearchCommand.class})
+@Command(name = "acs", description = "Alfresco Content Services commands", subcommands = {
+        NodesCommand.class, PersonCommand.class, GroupCommand.class, SearchCommand.class, SiteCommand.class})
 public class AcsCommand {
 
 }

@@ -11,9 +11,19 @@ import org.alfresco.cli.acs.GroupCommand.GroupMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.GroupsApi;
-import org.alfresco.core.model.*;
+import org.alfresco.core.model.Group;
+import org.alfresco.core.model.GroupBodyCreate;
+import org.alfresco.core.model.GroupBodyUpdate;
+import org.alfresco.core.model.GroupEntry;
+import org.alfresco.core.model.GroupMember;
+import org.alfresco.core.model.GroupMemberEntry;
+import org.alfresco.core.model.GroupMemberPagingList;
+import org.alfresco.core.model.GroupMembershipBodyCreate;
 import org.alfresco.core.model.GroupMembershipBodyCreate.MemberTypeEnum;
+import org.alfresco.core.model.GroupPaging;
+import org.alfresco.core.model.GroupPagingList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
@@ -22,16 +32,19 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Component
-@Command(name = "group", subcommands = GroupMemberCommand.class)
+@Command(name = "group", description = "Group commands", subcommands = GroupMemberCommand.class)
 public class GroupCommand {
 
+    @Autowired
+    ApplicationContext appCtx;
+    
     @Autowired
     GroupsApi groupsApi;
 
     @CommandLine.Mixin
     FormatProviderRegistry formatProvider;
 
-    @Command(description = "Get group list.")
+    @Command(description = "Get group list")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                     description = "Number of items to be skipped") Integer skipCount,
@@ -46,7 +59,7 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(description = "Create group.")
+    @Command(description = "Create group")
     public Integer create(@Parameters(description = "Id of the Site") String id,
             @Option(names = {"-dn", "--displayName"}, required = true,
                     description = "Display name") String displayName,
@@ -59,14 +72,14 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(description = "Get group details.")
+    @Command(description = "Get group details")
     public Integer get(@Parameters(description = "Group identifier") String id) {
         Group result = groupsApi.getGroup(id, null, null).getBody().getEntry();
         formatProvider.print(result);
         return 0;
     }
 
-    @Command(description = "Update group.")
+    @Command(description = "Update group")
     public Integer update(@Parameters(description = "Group identifier") String id,
             @Option(names = {"-dn", "--displayName"}, required = true,
                     description = "Display name") String displayName) {
@@ -77,7 +90,7 @@ public class GroupCommand {
         return 0;
     }
 
-    @Command(description = "Delete group.")
+    @Command(description = "Delete group")
     public Integer delete(@Parameters(description = "Group identifier") String id,
             @Option(names = {"-c", "--cascade"}, defaultValue = "false",
                     description = "Cascade deleted: true, false") Boolean cascade) {
@@ -87,7 +100,7 @@ public class GroupCommand {
     }
 
     @Component
-    @Command(name = "member", description = "List, create and delete group members.")
+    @Command(name = "member", description = "List, create and delete group members")
     static class GroupMemberCommand {
 
         @Autowired
@@ -96,7 +109,7 @@ public class GroupCommand {
         @CommandLine.Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "List group members.")
+        @Command(description = "List group members")
         public Integer list(@Parameters(description = "Group identifier") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                         description = "Number of items to be skipped") Integer skipCount,
@@ -111,7 +124,7 @@ public class GroupCommand {
             return 0;
         }
 
-        @Command(description = "Create group member.")
+        @Command(description = "Create group member")
         public Integer create(@Parameters(description = "Group identifier") String id,
                 @Parameters(description = "User Id") String memberId, @Parameters(
                         description = "Member type. Valid values: ${COMPLETION-CANDIDATES}") MemberTypeEnum memberType) {
@@ -122,7 +135,7 @@ public class GroupCommand {
             return 0;
         }
 
-        @Command(description = "Delete group member.")
+        @Command(description = "Delete group member")
         public Integer delete(@Parameters(description = "Group identifier") String id,
                 @Parameters(description = "User Id") String personId) {
             groupsApi.deleteGroupMembership(id, personId);

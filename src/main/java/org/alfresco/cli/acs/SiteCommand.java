@@ -30,7 +30,7 @@ import picocli.CommandLine.Parameters;
 
 @Component
 @Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class},
-        description = "Site commands.")
+        description = "Site commands")
 public class SiteCommand {
 
     @Autowired
@@ -39,7 +39,7 @@ public class SiteCommand {
     @Mixin
     FormatProviderRegistry formatProvider;
 
-    @Command(description = "Get site list.")
+    @Command(description = "Get site list")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                     description = "Number of items to be skipped") Integer skipCount,
@@ -53,7 +53,7 @@ public class SiteCommand {
         return 0;
     }
 
-    @Command(description = "Create site.")
+    @Command(description = "Create site")
     public Integer create(@Parameters(description = "Id of the Site") String id,
             @Option(names = {"-d", "--description"},
                     description = "Description of the Site") String description,
@@ -67,7 +67,7 @@ public class SiteCommand {
         return 0;
     }
 
-    @Command(description = "Get site details.")
+    @Command(description = "Get site details")
     public Integer get(@Parameters(description = "Id of the Site") String id) {
         Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
         formatProvider.print(site);
@@ -89,7 +89,7 @@ public class SiteCommand {
         return 0;
     }
 
-    @Command(description = "Delete site.")
+    @Command(description = "Delete site")
     public Integer delete(@Parameters(description = "Id of the Site") String id,
             @Option(names = {"-p", "--permanent"}, defaultValue = "false",
                     description = "Permanently deleted: true, false") Boolean permanent) {
@@ -99,7 +99,7 @@ public class SiteCommand {
     }
 
     @Component
-    @Command(name = "container", description = "Site container commands.")
+    @Command(name = "container", description = "Site container commands")
     class SiteContainerCommand {
 
         @Autowired
@@ -108,7 +108,7 @@ public class SiteCommand {
         @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "Get site container list.")
+        @Command(description = "Get site container list")
         public Integer list(@Parameters(description = "Id of the Site") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                         description = "Number of items to be skipped") Integer skipCount,
@@ -131,7 +131,7 @@ public class SiteCommand {
     }
 
     @Component
-    @Command(name = "member", description = "Site members commands.")
+    @Command(name = "member", description = "Site members commands")
     class SiteMemberCommand {
 
         @Autowired
@@ -140,7 +140,7 @@ public class SiteCommand {
         @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "Get site members list.")
+        @Command(description = "Get site members list")
         public Integer list(@Parameters(description = "Id of the Site") String id,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                         description = "Number of items to be skipped") Integer skipCount,
@@ -152,7 +152,7 @@ public class SiteCommand {
             return 0;
         }
 
-        @Command(description = "Create site member.")
+        @Command(description = "Create site member")
         public Integer create(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String userId, @Parameters(
                         description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyCreate.RoleEnum role) {
@@ -163,7 +163,7 @@ public class SiteCommand {
             return 0;
         }
 
-        @Command(description = "Get site member details.")
+        @Command(description = "Get site member details")
         public Integer get(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String personId) {
             SiteRole siteRole =
@@ -172,7 +172,7 @@ public class SiteCommand {
             return 0;
         }
 
-        @Command(description = "Update site member.")
+        @Command(description = "Update site member")
         public Integer update(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String personId, @Parameters(
                         description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
@@ -182,7 +182,7 @@ public class SiteCommand {
             return 0;
         }
 
-        @Command(description = "Delete site member.")
+        @Command(description = "Delete site member")
         public Integer delete(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String personId) {
             sitesApi.deleteSiteMembership(id, personId);

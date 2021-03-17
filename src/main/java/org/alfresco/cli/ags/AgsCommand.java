@@ -35,7 +35,7 @@ public class AgsCommand {
         @Autowired
         private SecuredNodesApi securedNodesApi;
 
-        @Command(description = "List all security marks assigned to a node.")
+        @Command(description = "List all security marks assigned to a node")
         public Integer list(@Parameters(description = "Node identifier") String nodeId,
                 @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
                         description = "Number of items to be skipped") Integer skipCount,
@@ -57,7 +57,7 @@ public class AgsCommand {
             OpEnum op;
         }
 
-        @Command(description = "Manage the existing security marks for a node.")
+        @Command(description = "Manage the existing security marks for a node")
         public Integer update(@Parameters(description = "Node identifier") String nodeId,
                 @ArgGroup(exclusive = false,
                         multiplicity = "1..*") List<SecuringMarkUpdate> securingMarkUpdates) {
