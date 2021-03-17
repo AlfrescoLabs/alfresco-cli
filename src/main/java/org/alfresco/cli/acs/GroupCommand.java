@@ -9,12 +9,14 @@ package org.alfresco.cli.acs;
 import java.util.List;
 import org.alfresco.cli.acs.GroupCommand.GroupMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
+import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.GroupsApi;
 import org.alfresco.core.model.*;
 import org.alfresco.core.model.GroupMembershipBodyCreate.MemberTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -24,7 +26,10 @@ import picocli.CommandLine.Parameters;
 public class GroupCommand {
 
     @Autowired
-    private GroupsApi groupsApi;
+    GroupsApi groupsApi;
+
+    @CommandLine.Mixin
+    FormatProviderRegistry formatProvider;
 
     @Command(description = "Get group list.")
     public Integer list(
@@ -36,15 +41,13 @@ public class GroupCommand {
                     description = "Filter for returned items") String where) {
         ResponseEntity<GroupPaging> response =
                 groupsApi.listGroups(skipCount, maxItems, null, null, where, null);
-        List<GroupEntry> result = response.getBody().getList().getEntries();
-        System.out.println(result);
+        GroupPagingList result = response.getBody().getList();
+        formatProvider.print(result);
         return 0;
     }
 
     @Command(description = "Create group.")
-    public Integer create(
-            @Option(names = {"-id", "--id"}, required = true,
-                    description = "Group identifier") String id,
+    public Integer create(@Parameters(description = "Id of the Site") String id,
             @Option(names = {"-dn", "--displayName"}, required = true,
                     description = "Display name") String displayName,
             @Option(names = {"-pi", "--parentIds"},
@@ -52,14 +55,14 @@ public class GroupCommand {
         Group result = groupsApi.createGroup(
                 new GroupBodyCreate().id(id).displayName(displayName).parentIds(parentIds), null,
                 null).getBody().getEntry();
-        System.out.println(result);
+        formatProvider.print(result);
         return 0;
     }
 
     @Command(description = "Get group details.")
     public Integer get(@Parameters(description = "Group identifier") String id) {
         Group result = groupsApi.getGroup(id, null, null).getBody().getEntry();
-        System.out.println(result);
+        formatProvider.print(result);
         return 0;
     }
 
@@ -70,7 +73,7 @@ public class GroupCommand {
         Group result = groupsApi
                 .updateGroup(id, new GroupBodyUpdate().displayName(displayName), null, null)
                 .getBody().getEntry();
-        System.out.println(result);
+        formatProvider.print(result);
         return 0;
     }
 
@@ -79,7 +82,7 @@ public class GroupCommand {
             @Option(names = {"-c", "--cascade"}, defaultValue = "false",
                     description = "Cascade deleted: true, false") Boolean cascade) {
         groupsApi.deleteGroup(id, cascade);
-        System.out.println(id);
+        formatProvider.print(id);
         return 0;
     }
 
@@ -94,10 +97,10 @@ public class GroupCommand {
                         description = "Number of items to be returned") Integer maxItems,
                 @Option(names = {"-w", "--where"},
                         description = "Filter for returned items") String where) {
-            List<GroupMemberEntry> result =
+            GroupMemberPagingList result =
                     groupsApi.listGroupMemberships(id, skipCount, maxItems, null, where, null)
-                            .getBody().getList().getEntries();
-            System.out.println(result);
+                            .getBody().getList();
+            formatProvider.print(result);
             return 0;
         }
 
@@ -108,7 +111,7 @@ public class GroupCommand {
             GroupMember result = groupsApi.createGroupMembership(id,
                     new GroupMembershipBodyCreate().id(memberId).memberType(memberType), null)
                     .getBody().getEntry();
-            System.out.println(result);
+            formatProvider.print(result);
             return 0;
         }
 
@@ -116,7 +119,7 @@ public class GroupCommand {
         public Integer delete(@Parameters(description = "Group identifier") String id,
                 @Parameters(description = "User Id") String personId) {
             groupsApi.deleteGroupMembership(id, personId);
-            System.out.println(personId);
+            formatProvider.print(personId);
             return 0;
         }
     }
@@ -165,4 +168,50 @@ public class GroupCommand {
             return DEFAULT.equals(format) && GroupPagingList.class == itemClass;
         }
     }
+
+    @Component
+    static class GroupMemberProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupMember groupMember = (GroupMember) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-40s", "ID", "DISPLAY", "TYPE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-40s", groupMember.getId(), groupMember.getDisplayName(), groupMember.getMemberType());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && GroupMember.class == itemClass;
+        }
+    }
+
+    @Component
+    static class GroupMemberPagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final GroupMemberPagingList groupMemberList = (GroupMemberPagingList) item;
+            List<GroupMemberEntry> entries = groupMemberList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s %-40s", "ID", "DISPLAY", "TYPE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-40s %-40s %-40s", entry.getId(), entry.getDisplayName(), entry.getMemberType());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && GroupMemberPagingList.class == itemClass;
+        }
+    }
+
 }
