@@ -4,10 +4,12 @@ import java.util.List;
 import org.alfresco.cli.acs.SiteCommand.SiteContainerCommand;
 import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
+import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.SitesApi;
 import org.alfresco.core.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -20,6 +22,9 @@ public class SiteCommand {
     @Autowired
     SitesApi sitesApi;
 
+    @CommandLine.Mixin
+    FormatProviderRegistry formatProvider;
+
     @Command(description = "Get site list.")
     public Integer list(
             @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
@@ -28,9 +33,9 @@ public class SiteCommand {
                     description = "Number of items to be returned") Integer maxItems,
             @Option(names = {"-w", "--where"},
                     description = "Filter for returned sites") String where) {
-        List<SiteEntry> sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
-                .getBody().getList().getEntries();
-        System.out.println(sites);
+        SitePagingList sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
+                .getBody().getList();
+        formatProvider.print(sites);
         return 0;
     }
 
@@ -44,14 +49,14 @@ public class SiteCommand {
                     description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteBodyCreate.VisibilityEnum visibility) {
         Site site = sitesApi.createSite(new SiteBodyCreate().id(id).description(description)
                 .title(title).visibility(visibility), null, null, null).getBody().getEntry();
-        System.out.println(site);
+        formatProvider.print(site);
         return 0;
     }
 
     @Command(description = "Get site details.")
     public Integer get(@Parameters(description = "Id of the Site") String id) {
         Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
-        System.out.println(site);
+        formatProvider.print(site);
         return 0;
     }
 
@@ -66,7 +71,7 @@ public class SiteCommand {
         Site site = sitesApi.updateSite(id,
                 new SiteBodyUpdate().title(title).description(description).visibility(visibility),
                 null).getBody().getEntry();
-        System.out.println(site);
+        formatProvider.print(site);
         return 0;
     }
 
@@ -75,7 +80,7 @@ public class SiteCommand {
             @Option(names = {"-p", "--permanent"}, defaultValue = "false",
                     description = "Permanently deleted: true, false") Boolean permanent) {
         sitesApi.deleteSite(id, permanent);
-        System.out.println(id);
+        formatProvider.print(id);
         return 0;
     }
 
@@ -88,10 +93,9 @@ public class SiteCommand {
                         description = "Number of items to be skipped") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
                         description = "Number of items to be returned") Integer maxItems) {
-            List<SiteContainerEntry> siteContainers =
-                    sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList()
-                            .getEntries();
-            System.out.println(siteContainers);
+            SiteContainerPagingList siteContainers =
+                    sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList();
+            formatProvider.print(siteContainers);
             return 0;
         }
 
@@ -100,7 +104,7 @@ public class SiteCommand {
                 description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki") String containerId) {
             SiteContainer siteContainer =
                     sitesApi.getSiteContainer(id, containerId, null).getBody().getEntry();
-            System.out.println(siteContainer);
+            formatProvider.print(siteContainer);
             return 0;
         }
     }
@@ -114,10 +118,9 @@ public class SiteCommand {
                         description = "Number of items to be skipped") Integer skipCount,
                 @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
                         description = "Number of items to be returned") Integer maxItems) {
-            List<SiteMemberEntry> members =
-                    sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList()
-                            .getEntries();
-            System.out.println(members);
+            SiteMemberPagingList members =
+                    sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList();
+            formatProvider.print(members);
             return 0;
         }
 
@@ -128,7 +131,7 @@ public class SiteCommand {
             SiteMember siteMember = sitesApi.createSiteMembership(id,
                     new SiteMembershipBodyCreate().id(userId).role(role), null).getBody()
                     .getEntry();
-            System.out.println(siteMember);
+            formatProvider.print(siteMember);
             return 0;
         }
 
@@ -137,7 +140,7 @@ public class SiteCommand {
                 @Parameters(description = "User Id") String personId) {
             SiteRole siteRole =
                     sitesApi.getSiteMembershipForPerson(personId, id).getBody().getEntry();
-            System.out.println(siteRole);
+            formatProvider.print(siteRole);
             return 0;
         }
 
@@ -147,7 +150,7 @@ public class SiteCommand {
                         description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
             SiteMember siteMember = sitesApi.updateSiteMembership(id, personId,
                     new SiteMembershipBodyUpdate().role(role), null).getBody().getEntry();
-            System.out.println(siteMember);
+            formatProvider.print(siteMember);
             return 0;
         }
 
@@ -155,12 +158,102 @@ public class SiteCommand {
         public Integer delete(@Parameters(description = "Id of the Site") String id,
                 @Parameters(description = "User Id") String personId) {
             sitesApi.deleteSiteMembership(id, personId);
-            System.out.println(personId);
+            formatProvider.print(personId);
             return 0;
         }
     }
 
     // TODO Add "/sites/{siteId}/group-members" when endpoints are available in SDK
+
+    @Component
+    static class SiteProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final Site site = (Site) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-40s %-20s", "ID", "TITLE", "VISIBILITY");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-40s %-20s", site.getId(), site.getTitle(), site.getVisibility());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && Site.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SitePagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SitePagingList siteList = (SitePagingList) item;
+            List<SiteEntry> entries = siteList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-40s %-20s", "ID", "TITLE", "VISIBILITY");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-20s %-40s %-20s", entry.getId(), entry.getTitle(), entry.getVisibility());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SitePagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteContainerProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteContainer siteContainer = (SiteContainer) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s", "ID", "FOLDER-ID");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s", siteContainer.getId(), siteContainer.getFolderId());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteContainer.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteContainerPagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteContainerPagingList siteContainerList = (SiteContainerPagingList) item;
+            List<SiteContainerEntry> entries = siteContainerList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-40s", "ID", "FOLDER-ID");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-40s %-40s", entry.getId(), entry.getFolderId());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteContainerPagingList.class == itemClass;
+        }
+    }
 
     @Component
     static class SiteRoleProvider implements FormatProvider {
