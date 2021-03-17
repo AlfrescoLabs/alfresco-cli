@@ -100,7 +100,7 @@ public class SiteCommand {
 
     @Component
     @Command(name = "container", description = "Site container commands.")
-    static class SiteContainerCommand {
+    class SiteContainerCommand {
 
         @Autowired
         SitesApi sitesApi;
@@ -132,7 +132,7 @@ public class SiteCommand {
 
     @Component
     @Command(name = "member", description = "Site members commands.")
-    static class SiteMemberCommand {
+    class SiteMemberCommand {
 
         @Autowired
         SitesApi sitesApi;
