@@ -16,57 +16,93 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "search", description = "Search commands")
+@Command(name = "search", description = "Search commands",
+        subcommands = {
+                SearchCommand.CmisCommand.class,
+                SearchCommand.FTSCommand.class,
+                SearchCommand.SQLCommand.class})
 public class SearchCommand {
-
-    @Mixin
-    FormatProviderRegistry formatProvider;
 
     @Autowired
     SearchApi searchApi;
 
     @Autowired
-    private SqlApi sqlApi;
+    SqlApi sqlApi;
 
-    @Command(description = "Execute cmis query.")
-    public Integer cmis(@Parameters(description = "Query (example >> \"select * from cmis:folder\"") String query,
-                        @Option(names = {"-pmi", "--paging-max-items"}, defaultValue = "100", description = "Max Items per Page") Integer pagingMaxItems,
-                        @Option(names = {"-psc", "--paging-skip-count"}, defaultValue = "0", description = "Skip Count initial results") Integer pagingSkipCount) {
-        ResultSetPagingList result =
-                searchApi.search(new SearchRequest()
-                        .query(new RequestQuery()
-                                .language(RequestQuery.LanguageEnum.CMIS)
-                                .query(query))
-                        .paging(new RequestPagination()
-                                .maxItems(pagingMaxItems)
-                                .skipCount(pagingSkipCount))).getBody().getList();
-        formatProvider.print(result);
-        return 0;
+    @Component
+    @Command(name = "cmis", description = "Execute cmis query.", mixinStandardHelpOptions = true)
+    class CmisCommand implements Callable<Integer> {
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
+        @Parameters(description = "Query (example >> \"select * from cmis:folder\"")
+        String query;
+        @Option(names = {"-pmi", "--paging-max-items"}, defaultValue = "100", description = "Max Items per Page")
+        Integer pagingMaxItems;
+        @Option(names = {"-psc", "--paging-skip-count"}, defaultValue = "0", description = "Skip Count initial results")
+        Integer pagingSkipCount;
+
+        @Override
+        public Integer call() {
+            ResultSetPagingList result =
+                    searchApi.search(new SearchRequest()
+                            .query(new RequestQuery()
+                                    .language(RequestQuery.LanguageEnum.CMIS)
+                                    .query(query))
+                            .paging(new RequestPagination()
+                                    .maxItems(pagingMaxItems)
+                                    .skipCount(pagingSkipCount))).getBody().getList();
+            formatProvider.print(result);
+            return 0;
+        }
     }
 
-    @Command(description = "Execute fts query.")
-    public Integer fts(@Parameters(description = "Query (example >> \"cm:title:foo\")") String query,
-                       @Option(names = {"-pmi", "--paging-max-items"}, defaultValue = "100", description = "Max Items per Page") Integer pagingMaxItems,
-                       @Option(names = {"-psc", "--paging-skip-count"}, defaultValue = "0", description = "Skip Count initial results") Integer pagingSkipCount) {
-        ResultSetPagingList result =
-                searchApi.search(new SearchRequest()
-                        .query(new RequestQuery()
-                                .language(RequestQuery.LanguageEnum.AFTS)
-                                .query(query))
-                        .paging(new RequestPagination()
-                                .maxItems(pagingMaxItems)
-                                .skipCount(pagingSkipCount))).getBody().getList();
-        formatProvider.print(result);
-        return 0;
+    @Component
+    @Command(name = "fts", description = "Execute FTS query.", mixinStandardHelpOptions = true)
+    class FTSCommand implements Callable<Integer> {
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
+        @Parameters(description = "Query (example >> \"cm:title:foo\")")
+        String query;
+        @Option(names = {"-pmi", "--paging-max-items"}, defaultValue = "100", description = "Max Items per Page")
+        Integer pagingMaxItems;
+        @Option(names = {"-psc", "--paging-skip-count"}, defaultValue = "0", description = "Skip Count initial results")
+        Integer pagingSkipCount;
+
+        @Override
+        public Integer call() {
+            ResultSetPagingList result =
+                    searchApi.search(new SearchRequest()
+                            .query(new RequestQuery()
+                                    .language(RequestQuery.LanguageEnum.AFTS)
+                                    .query(query))
+                            .paging(new RequestPagination()
+                                    .maxItems(pagingMaxItems)
+                                    .skipCount(pagingSkipCount))).getBody().getList();
+            formatProvider.print(result);
+            return 0;
+        }
     }
 
-    @Command(description = "Execute sql query.")
-    public Integer sql(@Parameters(description = "SQL Query (example >> \"select * from alfresco\")") String query) {
-        SQLResultSetPagingList result = sqlApi.search(new SQLSearchRequest().stmt(query)).getBody().getList();
-        formatProvider.print(result);
-        return 0;
+    @Component
+    @Command(name = "sql", description = "Execute FTS query.", mixinStandardHelpOptions = true)
+    class SQLCommand implements Callable<Integer> {
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
+        @Parameters(description = "SQL Query (example >> \"select * from alfresco\")")
+        String query;
+
+        @Override
+        public Integer call() {
+            SQLResultSetPagingList result = sqlApi.search(new SQLSearchRequest().stmt(query)).getBody().getList();
+            formatProvider.print(result);
+            return 0;
+        }
     }
 
     @Component
@@ -135,4 +171,5 @@ public class SearchCommand {
             return DEFAULT.equals(format) && SQLResultSetPagingList.class == itemClass;
         }
     }
+
 }
