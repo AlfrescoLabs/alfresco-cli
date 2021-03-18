@@ -6,8 +6,6 @@
  */
 package org.alfresco.cli.acs;
 
-import org.alfresco.cli.acs.PersonCommand.PersonGroupCommand;
-import org.alfresco.cli.acs.PersonCommand.PersonSiteCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.GroupsApi;
@@ -22,76 +20,218 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "person", subcommands = {PersonGroupCommand.class, PersonSiteCommand.class}, description = "Person commands")
+@Command(name = "person", description = "Person commands", subcommands = {
+        PersonCommand.ListPerson.class,
+        PersonCommand.CreatePerson.class,
+        PersonCommand.GetPerson.class,
+        PersonCommand.UpdatePerson.class,
+        PersonCommand.ListPersonGroup.class,
+        PersonCommand.PersonSiteList.class,
+        PersonCommand.PersonSiteGet.class,
+        PersonCommand.PersonSiteDelete.class
+})
 public class PersonCommand {
 
-    @Autowired
-    PeopleApi peopleApi;
+    static abstract class AbstractPersonCommand implements Callable<Integer> {
 
-    @Mixin
-    FormatProviderRegistry formatProvider;
+        @Autowired
+        PeopleApi peopleApi;
 
-    @Command(description = "Get people list")
-    public Integer list(
-            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                    description = "Number of items to be skipped") Integer skipCount,
-            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                    description = "Number of items to be returned") Integer maxItems) {
-        PersonPagingList sites = peopleApi.listPeople(skipCount, maxItems, null, null, null)
-                .getBody().getList();
-        formatProvider.print(sites);
-        return 0;
+        @Mixin
+        FormatProviderRegistry formatProvider;
+
     }
 
-    @Command(description = "Create person")
-    public Integer create(@Parameters(description = "Id of the Person") String id,
-                          @Option(names = {"-fn", "--first-name"}, required = true,
-                                  description = "First Name of the Person") String firstName,
-                          @Option(names = {"-ln", "--last-name"}, required = true,
-                                  description = "Last Name of the Person") String lastName,
-                          @Option(names = {"-e", "--email"}, required = true,
-                                  description = "Email of the Person") String email,
-                          @Option(names = {"-p", "--password"}, required = true,
-                                  description = "Password of the Person") String password) {
-        Person person = peopleApi.createPerson(new PersonBodyCreate()
-                .id(id)
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
-                .enabled(true), null)
-                .getBody().getEntry();
-        formatProvider.print(person);
-        return 0;
+    @Command(name = "list", description = "Get people list", mixinStandardHelpOptions = true)
+    class ListPerson extends AbstractPersonCommand {
+
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+
+        @Override
+        public Integer call() throws Exception {
+            PersonPagingList sites = peopleApi.listPeople(skipCount, maxItems, null, null, null)
+                    .getBody().getList();
+            formatProvider.print(sites);
+            return 0;
+        }
     }
 
-    @Command(description = "Get person details")
-    public Integer get(@Parameters(description = "Id of the Person") String id) {
-        Person person = peopleApi.getPerson(id, null).getBody().getEntry();
-        formatProvider.print(person);
-        return 0;
+    @Command(name = "create", description = "Create person", mixinStandardHelpOptions = true)
+    class CreatePerson extends AbstractPersonCommand {
+        @Parameters(description = "Id of the Person")
+        String id;
+        @Option(names = {"-fn", "--first-name"}, required = true,
+                description = "First Name of the Person")
+        String firstName;
+        @Option(names = {"-ln", "--last-name"}, required = true,
+                description = "Last Name of the Person")
+        String lastName;
+        @Option(names = {"-e", "--email"}, required = true,
+                description = "Email of the Person")
+        String email;
+        @Option(names = {"-p", "--password"}, required = true,
+                description = "Password of the Person")
+        String password;
+
+        @Override
+        public Integer call() throws Exception {
+            Person person = peopleApi.createPerson(new PersonBodyCreate()
+                    .id(id)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .password(password)
+                    .enabled(true), null)
+                    .getBody().getEntry();
+            formatProvider.print(person);
+            return 0;
+        }
     }
 
-    @Command(description = "Update person details")
-    public Integer update(@Parameters(description = "Id of the Person") String id,
-                          @Option(names = {"-fn", "--first-name"},
-                                  description = "First Name of the Person") String firstName,
-                          @Option(names = {"-ln", "--last-name"},
-                                  description = "Last Name of the Person") String lastName,
-                          @Option(names = {"-e", "--email"},
-                                  description = "Email of the Person") String email,
-                          @Option(names = {"-p", "--password"},
-                                  description = "Password of the Person") String password) {
-        Person person = peopleApi.updatePerson(id,
-                new PersonBodyUpdate()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .email(email)
-                        .password(password), null).getBody().getEntry();
-        formatProvider.print(person);
-        return 0;
+    @Command(name = "get", description = "Get person details", mixinStandardHelpOptions = true)
+    class GetPerson extends AbstractPersonCommand {
+        @Parameters(description = "Id of the Person")
+        String id;
+
+        @Override
+        public Integer call() throws Exception {
+            Person person = peopleApi.getPerson(id, null).getBody().getEntry();
+            formatProvider.print(person);
+            return 0;
+        }
+    }
+
+    @Command(name = "update", description = "Update person details", mixinStandardHelpOptions = true)
+    class UpdatePerson extends AbstractPersonCommand {
+        @Parameters(description = "Id of the Person")
+        String id;
+        @Option(names = {"-fn", "--first-name"},
+                description = "First Name of the Person")
+        String firstName;
+        @Option(names = {"-ln", "--last-name"},
+                description = "Last Name of the Person")
+        String lastName;
+        @Option(names = {"-e", "--email"},
+                description = "Email of the Person")
+        String email;
+        @Option(names = {"-p", "--password"},
+                description = "Password of the Person")
+        String password;
+
+        @Override
+        public Integer call() throws Exception {
+            Person person = peopleApi.updatePerson(id,
+                    new PersonBodyUpdate()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(email)
+                            .password(password)
+                            .enabled(true)
+                            .emailNotificationsEnabled(true)
+                            .oldPassword(password), null).getBody().getEntry();
+            formatProvider.print(person);
+            return 0;
+        }
+    }
+
+    @Command(name = "group-list", description = "Get person groups list", mixinStandardHelpOptions = true)
+    class ListPersonGroup implements Callable<Integer> {
+        @Autowired
+        GroupsApi groupsApi;
+        @Mixin
+        FormatProviderRegistry formatProvider;
+        @Parameters(description = "Id of the Person")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned sites")
+        String where;
+
+        @Override
+        public Integer call() throws Exception {
+            GroupPagingList groups =
+                    groupsApi.listGroupMembershipsForPerson(id, skipCount, maxItems, null, null, where, null)
+                            .getBody().getList();
+            formatProvider.print(groups);
+            return 0;
+        }
+    }
+
+    static abstract class AbstractPersonSiteCommand implements Callable<Integer> {
+
+        @Autowired
+        SitesApi sitesApi;
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
+
+    }
+
+    @Command(name = "list-site", description = "Get person sites list", mixinStandardHelpOptions = true)
+    class PersonSiteList extends AbstractPersonSiteCommand {
+        @Parameters(description = "Id of the Person")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned sites")
+        String where;
+
+        @Override
+        public Integer call() throws Exception {
+            SiteRolePagingList siteRoles =
+                    sitesApi.listSiteMembershipsForPerson(id, skipCount, maxItems, null, null, null, where)
+                            .getBody().getList();
+            formatProvider.print(siteRoles);
+            return 0;
+        }
+    }
+
+    @Command(name = "get-site", description = "Get person sites details", mixinStandardHelpOptions = true)
+    class PersonSiteGet extends AbstractPersonSiteCommand {
+        @Parameters(description = "Id of the Person")
+        String personId;
+        @Parameters(description = "Id of the Site")
+        String siteId;
+
+        @Override
+        public Integer call() throws Exception {
+            SiteRole siteRole = sitesApi.getSiteMembershipForPerson(personId, siteId).getBody().getEntry();
+            formatProvider.print(siteRole);
+            return 0;
+        }
+    }
+
+    @Command(name = "delete-site", description = "Get person sites details", mixinStandardHelpOptions = true)
+    class PersonSiteDelete extends AbstractPersonSiteCommand {
+        @Parameters(description = "Id of the Person")
+        String personId;
+        @Parameters(description = "Id of the Site")
+        String siteId;
+
+        @Override
+        public Integer call() throws Exception {
+            sitesApi.deleteSiteMembership(siteId, personId);
+            formatProvider.print(personId);
+            return 0;
+        }
     }
 
     @Component
@@ -171,74 +311,6 @@ public class PersonCommand {
         public boolean isApplicable(Class<?> itemClass, String format) {
             return ID.equals(format) && PersonPagingList.class == itemClass;
         }
-    }
-
-    @Command(name = "group", description = "Person groups commands")
-    static class PersonGroupCommand {
-
-        @Autowired
-        GroupsApi groupsApi;
-
-        @Mixin
-        FormatProviderRegistry formatProvider;
-
-        @Command(description = "Get person groups list")
-        public Integer list(@Parameters(description = "Id of the Person") String id,
-                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                                    description = "Number of items to be skipped") Integer skipCount,
-                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                                    description = "Number of items to be returned") Integer maxItems,
-                            @Option(names = {"-w", "--where"},
-                                    description = "Filter for returned sites") String where) {
-            GroupPagingList groups =
-                    groupsApi.listGroupMembershipsForPerson(id, skipCount, maxItems, null, null, where, null)
-                            .getBody().getList();
-            formatProvider.print(groups);
-            return 0;
-        }
-
-    }
-
-    @Command(name = "site", description = "Person sites commands")
-    static class PersonSiteCommand {
-
-        @Autowired
-        SitesApi sitesApi;
-
-        @Mixin
-        FormatProviderRegistry formatProvider;
-
-        @Command(description = "Get person sites list")
-        public Integer list(@Parameters(description = "Id of the Person") String id,
-                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                                    description = "Number of items to be skipped") Integer skipCount,
-                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                                    description = "Number of items to be returned") Integer maxItems,
-                            @Option(names = {"-w", "--where"},
-                                    description = "Filter for returned sites") String where) {
-            SiteRolePagingList siteRoles =
-                    sitesApi.listSiteMembershipsForPerson(id, skipCount, maxItems, null, null, null, where)
-                            .getBody().getList();
-            formatProvider.print(siteRoles);
-            return 0;
-        }
-
-        @Command(description = "Get person sites details")
-        public Integer get(@Parameters(description = "Id of the Person") String personId,
-                           @Parameters(description = "Id of the Site") String siteId) {
-            SiteRole siteRole = sitesApi.getSiteMembershipForPerson(personId, siteId).getBody().getEntry();
-            formatProvider.print(siteRole);
-            return 0;
-        }
-
-        @Command(description = "Delete person site membership")
-        public Integer delete(@Parameters(description = "Id of the Person") String personId,
-                           @Parameters(description = "Id of the Site") String siteId) {
-            sitesApi.deleteSiteMembership(siteId, personId);
-            formatProvider.print(personId);
-            return 0;
-        }
-
     }
 
 }
