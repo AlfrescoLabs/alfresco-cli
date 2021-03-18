@@ -1,7 +1,5 @@
 package org.alfresco.cli.acs;
 
-import org.alfresco.cli.acs.SiteCommand.SiteContainerCommand;
-import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.SitesApi;
@@ -14,80 +12,31 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class, SiteCommand.SiteGroupMemberCommand.class},
+@Command(name = "site", subcommands = {
+        SiteCommand.ListSite.class,
+        SiteCommand.CreateSite.class,
+        SiteCommand.GetSite.class,
+        SiteCommand.UpdateSite.class,
+        SiteCommand.DeleteSite.class,
+        SiteCommand.ListSiteContainer.class,
+        SiteCommand.GetSiteContainer.class,
+        SiteCommand.ListSiteMember.class,
+        SiteCommand.CreateSiteMember.class,
+        SiteCommand.GetSiteMember.class,
+        SiteCommand.UpdateSiteMember.class,
+        SiteCommand.DeleteSiteMember.class,
+        SiteCommand.ListGroupMember.class,
+        SiteCommand.CreateGroupMember.class,
+        SiteCommand.GetGroupMember.class,
+        SiteCommand.UpdateGroupMember.class,
+        SiteCommand.DeleteGroupMember.class},
         description = "Site commands")
 public class SiteCommand {
 
-    @Autowired
-    SitesApi sitesApi;
-
-    @Mixin
-    FormatProviderRegistry formatProvider;
-
-    @Command(description = "Get site list")
-    public Integer list(
-            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                    description = "Number of items to be skipped") Integer skipCount,
-            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                    description = "Number of items to be returned") Integer maxItems,
-            @Option(names = {"-w", "--where"},
-                    description = "Filter for returned sites") String where) {
-        SitePagingList sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
-                .getBody().getList();
-        formatProvider.print(sites);
-        return 0;
-    }
-
-    @Command(description = "Create site")
-    public Integer create(@Parameters(description = "Id of the Site") String id,
-            @Option(names = {"-d", "--description"},
-                    description = "Description of the Site") String description,
-            @Option(names = {"-t", "--title"}, required = true,
-                    description = "Title of the Site") String title,
-            @Option(names = {"-v", "--visibility"}, required = true,
-                    description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteBodyCreate.VisibilityEnum visibility) {
-        Site site = sitesApi.createSite(new SiteBodyCreate().id(id).description(description)
-                .title(title).visibility(visibility), null, null, null).getBody().getEntry();
-        formatProvider.print(site);
-        return 0;
-    }
-
-    @Command(description = "Get site details")
-    public Integer get(@Parameters(description = "Id of the Site") String id) {
-        Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
-        formatProvider.print(site);
-        return 0;
-    }
-
-    @Command(name = "update")
-    public Integer update(@Parameters(description = "Id of the Site") String id,
-            @Option(names = {"-d", "--description"}, required = true,
-                    description = "Description of the Site") String description,
-            @Option(names = {"-t", "--title"}, required = true,
-                    description = "Title of the Site") String title,
-            @Option(names = {"-v", "--visibility"}, required = true,
-                    description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteBodyUpdate.VisibilityEnum visibility) {
-        Site site = sitesApi.updateSite(id,
-                new SiteBodyUpdate().title(title).description(description).visibility(visibility),
-                null).getBody().getEntry();
-        formatProvider.print(site);
-        return 0;
-    }
-
-    @Command(description = "Delete site")
-    public Integer delete(@Parameters(description = "Id of the Site") String id,
-            @Option(names = {"-p", "--permanent"}, defaultValue = "false",
-                    description = "Permanently deleted: true, false") Boolean permanent) {
-        sitesApi.deleteSite(id, permanent);
-        formatProvider.print(id);
-        return 0;
-    }
-
-    @Component
-    @Command(name = "container", description = "Site container commands")
-    class SiteContainerCommand {
+    static abstract class AbstractSiteCommand implements Callable<Integer> {
 
         @Autowired
         SitesApi sitesApi;
@@ -95,21 +44,135 @@ public class SiteCommand {
         @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "Get site container list")
-        public Integer list(@Parameters(description = "Id of the Site") String id,
-                @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of items to be skipped") Integer skipCount,
-                @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of items to be returned") Integer maxItems) {
+    }
+
+    @Command(name = "list", description = "Get site list", mixinStandardHelpOptions = true)
+    class ListSite extends AbstractSiteCommand {
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned sites")
+        String where;
+
+        @Override
+        public Integer call() throws Exception {
+            SitePagingList sites = sitesApi.listSites(skipCount, maxItems, null, null, null, where)
+                    .getBody().getList();
+            formatProvider.print(sites);
+            return 0;
+        }
+    }
+
+    @Command(name = "create", description = "Create site", mixinStandardHelpOptions = true)
+    class CreateSite extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-d", "--description"},
+                description = "Description of the Site")
+        String description;
+        @Option(names = {"-t", "--title"}, required = true,
+                description = "Title of the Site")
+        String title;
+        @Option(names = {"-v", "--visibility"}, required = true,
+                description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteBodyCreate.VisibilityEnum visibility;
+
+        @Override
+        public Integer call() throws Exception {
+            Site site = sitesApi.createSite(new SiteBodyCreate().id(id).description(description)
+                    .title(title).visibility(visibility), null, null, null).getBody().getEntry();
+            formatProvider.print(site);
+            return 0;
+        }
+    }
+
+    @Command(name = "get", description = "Get site details", mixinStandardHelpOptions = true)
+    class GetSite extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+
+        @Override
+        public Integer call() throws Exception {
+            Site site = sitesApi.getSite(id, null, null).getBody().getEntry();
+            formatProvider.print(site);
+            return 0;
+        }
+    }
+
+    @Command(name = "update", description = "Update site", mixinStandardHelpOptions = true)
+    class UpdateSite extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-d", "--description"}, required = true,
+                description = "Description of the Site")
+        String description;
+        @Option(names = {"-t", "--title"}, required = true,
+                description = "Title of the Site")
+        String title;
+        @Option(names = {"-v", "--visibility"}, required = true,
+                description = "Visibility of the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteBodyUpdate.VisibilityEnum visibility;
+
+        @Override
+        public Integer call() throws Exception {
+            Site site = sitesApi.updateSite(id,
+                    new SiteBodyUpdate().title(title).description(description).visibility(visibility),
+                    null).getBody().getEntry();
+            formatProvider.print(site);
+            return 0;
+        }
+    }
+
+    @Command(name = "delete", description = "Delete site", mixinStandardHelpOptions = true)
+    class DeleteSite extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-p", "--permanent"}, defaultValue = "false",
+                description = "Permanently deleted: true, false")
+        Boolean permanent;
+
+        @Override
+        public Integer call() throws Exception {
+            sitesApi.deleteSite(id, permanent);
+            formatProvider.print(id);
+            return 0;
+        }
+    }
+
+    @Command(name = "list-container", description = "Get site container list", mixinStandardHelpOptions = true)
+    class ListSiteContainer extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+
+        @Override
+        public Integer call() throws Exception {
             SiteContainerPagingList siteContainers =
                     sitesApi.listSiteContainers(id, skipCount, maxItems, null).getBody().getList();
             formatProvider.print(siteContainers);
             return 0;
         }
+    }
 
-        @Command(description = "Get site container details")
-        public Integer get(@Parameters(description = "Id of the Site") String id, @Parameters(
-                description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki") String containerId) {
+    @Command(name = "get-container", description = "Get site container details", mixinStandardHelpOptions = true)
+    class GetSiteContainer extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(
+                description = "Id of the Container: documentLibrary, dataLists, discussions, links, wiki")
+        String containerId;
+
+        @Override
+        public Integer call() throws Exception {
             SiteContainer siteContainer =
                     sitesApi.getSiteContainer(id, containerId, null).getBody().getEntry();
             formatProvider.print(siteContainer);
@@ -117,129 +180,187 @@ public class SiteCommand {
         }
     }
 
-    @Component
-    @Command(name = "member", description = "Site members commands")
-    class SiteMemberCommand {
+    @Command(name = "list-member", description = "Get site members list", mixinStandardHelpOptions = true)
+    class ListSiteMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned sites")
+        String where;
 
-        @Autowired
-        SitesApi sitesApi;
-
-        @Mixin
-        FormatProviderRegistry formatProvider;
-
-        @Command(description = "Get site members list")
-        public Integer list(@Parameters(description = "Id of the Site") String id,
-                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                                    description = "Number of items to be skipped") Integer skipCount,
-                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                                    description = "Number of items to be returned") Integer maxItems,
-                            @Option(names = {"-w", "--where"},
-                                    description = "Filter for returned sites") String where) {
+        @Override
+        public Integer call() throws Exception {
             SiteMemberPagingList members =
                     sitesApi.listSiteMemberships(id, skipCount, maxItems, null, where).getBody().getList();
             formatProvider.print(members);
             return 0;
         }
+    }
 
-        @Command(description = "Create site member")
-        public Integer create(@Parameters(description = "Id of the Site") String id,
-                @Parameters(description = "User Id") String userId, @Parameters(
-                        description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyCreate.RoleEnum role) {
+    @Command(name = "create-member", description = "Create site member", mixinStandardHelpOptions = true)
+    class CreateSiteMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "User Id")
+        String userId;
+        @Parameters(
+                description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteMembershipBodyCreate.RoleEnum role;
+
+        @Override
+        public Integer call() throws Exception {
             SiteMember siteMember = sitesApi.createSiteMembership(id,
                     new SiteMembershipBodyCreate().id(userId).role(role), null).getBody()
                     .getEntry();
             formatProvider.print(siteMember);
             return 0;
         }
+    }
 
-        @Command(description = "Get site member details")
-        public Integer get(@Parameters(description = "Id of the Site") String id,
-                @Parameters(description = "User Id") String personId) {
+    @Command(name = "get-member", description = "Get site member details", mixinStandardHelpOptions = true)
+    class GetSiteMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "User Id")
+        String personId;
+
+        @Override
+        public Integer call() throws Exception {
             SiteRole siteRole =
                     sitesApi.getSiteMembershipForPerson(personId, id).getBody().getEntry();
             formatProvider.print(siteRole);
             return 0;
         }
+    }
 
-        @Command(description = "Update site member")
-        public Integer update(@Parameters(description = "Id of the Site") String id,
-                @Parameters(description = "User Id") String personId, @Parameters(
-                        description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
+    @Command(name = "update-member", description = "Update site member", mixinStandardHelpOptions = true)
+    class UpdateSiteMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "User Id")
+        String personId;
+        @Parameters(
+                description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteMembershipBodyUpdate.RoleEnum role;
+
+        @Override
+        public Integer call() throws Exception {
             SiteMember siteMember = sitesApi.updateSiteMembership(id, personId,
                     new SiteMembershipBodyUpdate().role(role), null).getBody().getEntry();
             formatProvider.print(siteMember);
             return 0;
         }
+    }
 
-        @Command(description = "Delete site member")
-        public Integer delete(@Parameters(description = "Id of the Site") String id,
-                @Parameters(description = "User Id") String personId) {
+    @Command(name = "delete-member", description = "Delete site member", mixinStandardHelpOptions = true)
+    class DeleteSiteMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "User Id")
+        String personId;
+
+        @Override
+        public Integer call() throws Exception {
             sitesApi.deleteSiteMembership(id, personId);
             formatProvider.print(personId);
             return 0;
         }
     }
 
-    @Component
-    @Command(name = "group-member", description = "Site members commands")
-    class SiteGroupMemberCommand {
+    @Command(name = "list-group-member", description = "Get group member list", mixinStandardHelpOptions = true)
+    class ListGroupMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
 
-        @Autowired
-        SitesApi sitesApi;
-
-        @Mixin
-        FormatProviderRegistry formatProvider;
-
-        @Command(description = "Get group members list")
-        public Integer list(@Parameters(description = "Id of the Site") String id,
-                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                                    description = "Number of items to be skipped") Integer skipCount,
-                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                                    description = "Number of items to be returned") Integer maxItems) {
+        @Override
+        public Integer call() throws Exception {
             SiteGroupPagingList members =
                     sitesApi.listSiteGroups(id, skipCount, maxItems, null).getBody().getList();
             formatProvider.print(members);
             return 0;
         }
+    }
 
-        @Command(description = "Create site group member")
-        public Integer create(@Parameters(description = "Id of the Site") String id,
-                              @Parameters(description = "Group Id") String groupId,
-                              @Parameters(description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyCreate.RoleEnum role) {
+    @Command(name = "create-group-member", description = "Create site group member", mixinStandardHelpOptions = true)
+    class CreateGroupMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "Group Id")
+        String groupId;
+        @Parameters(description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteMembershipBodyCreate.RoleEnum role;
+
+        @Override
+        public Integer call() throws Exception {
             SiteGroup siteMember = sitesApi.createSiteGroupMembership(id,
                     new SiteMembershipBodyCreate().id(groupId).role(role), null).getBody()
                     .getEntry();
             formatProvider.print(siteMember);
             return 0;
         }
+    }
 
-        @Command(description = "Get site group member details")
-        public Integer get(@Parameters(description = "Id of the Site") String id,
-                           @Parameters(description = "Group Id") String groupId) {
+    @Command(name = "get-group-member", description = "Get site group member details", mixinStandardHelpOptions = true)
+    class GetGroupMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "Group Id")
+        String groupId;
+
+        @Override
+        public Integer call() throws Exception {
             SiteGroup siteGroup =
                     sitesApi.getSiteGroupMembership(id, groupId, null).getBody().getEntry();
             formatProvider.print(siteGroup);
             return 0;
         }
+    }
 
-        @Command(description = "Update site group member")
-        public Integer update(@Parameters(description = "Id of the Site") String id,
-                              @Parameters(description = "Group Id") String groupId, @Parameters(
-                description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
+    @Command(name = "update-group-member", description = "Update site group member", mixinStandardHelpOptions = true)
+    class UpdateGroupMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "Group Id")
+        String groupId;
+        @Parameters(
+                description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}")
+        SiteMembershipBodyUpdate.RoleEnum role;
+
+        @Override
+        public Integer call() throws Exception {
             SiteGroup siteGroup = sitesApi.updateSiteGroupMembership(id, groupId,
                     new SiteMembershipBodyUpdate().role(role), null).getBody().getEntry();
             formatProvider.print(siteGroup);
             return 0;
         }
+    }
 
-        @Command(description = "Delete site group member")
-        public Integer delete(@Parameters(description = "Id of the Site") String id,
-                              @Parameters(description = "User Id") String groupId) {
+
+    @Command(name = "delete-group-member", description = "Delete site group member", mixinStandardHelpOptions = true)
+    class DeleteGroupMember extends AbstractSiteCommand {
+        @Parameters(description = "Id of the Site")
+        String id;
+        @Parameters(description = "User Id")
+        String groupId;
+
+        @Override
+        public Integer call() throws Exception {
             sitesApi.deleteSiteGroupMembership(id, groupId);
             formatProvider.print(groupId);
             return 0;
         }
-
     }
 
     @Component
@@ -556,6 +677,85 @@ public class SiteCommand {
         @Override
         public boolean isApplicable(Class<?> itemClass, String format) {
             return ID.equals(format) && SiteGroupPagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteMemberProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteMember siteMember = (SiteMember) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", "ID", "ROLE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", siteMember.getId(), siteMember.getRole());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteMember.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteMemberIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteMember siteMember = (SiteMember) item;
+            System.out.printf(siteMember.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteMember.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteMemberPagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteMemberPagingList siteMemberList = (SiteMemberPagingList) item;
+            List<SiteMemberEntry> entries = siteMemberList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", "ID", "ROLE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-40s %-20s", entry.getId(), entry.getRole());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteMemberPagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteMemberPagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteMemberPagingList siteMemberList = (SiteMemberPagingList) item;
+            List<SiteMemberEntry> entries = siteMemberList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteMemberPagingList.class == itemClass;
         }
     }
 
