@@ -16,7 +16,7 @@ import picocli.CommandLine.Parameters;
 import java.util.List;
 
 @Component
-@Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class},
+@Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class, SiteCommand.SiteGroupMemberCommand.class},
         description = "Site commands")
 public class SiteCommand {
 
@@ -180,7 +180,67 @@ public class SiteCommand {
         }
     }
 
-    // TODO Add "/sites/{siteId}/group-members" when endpoints are available in SDK
+    @Component
+    @Command(name = "group-member", description = "Site members commands")
+    class SiteGroupMemberCommand {
+
+        @Autowired
+        SitesApi sitesApi;
+
+        @Mixin
+        FormatProviderRegistry formatProvider;
+
+        @Command(description = "Get group members list")
+        public Integer list(@Parameters(description = "Id of the Site") String id,
+                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                                    description = "Number of items to be skipped") Integer skipCount,
+                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                                    description = "Number of items to be returned") Integer maxItems) {
+            SiteGroupPagingList members =
+                    sitesApi.listSiteGroups(id, skipCount, maxItems, null).getBody().getList();
+            formatProvider.print(members);
+            return 0;
+        }
+
+        @Command(description = "Create site group member")
+        public Integer create(@Parameters(description = "Id of the Site") String id,
+                              @Parameters(description = "Group Id") String groupId,
+                              @Parameters(description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyCreate.RoleEnum role) {
+            SiteGroup siteMember = sitesApi.createSiteGroupMembership(id,
+                    new SiteMembershipBodyCreate().id(groupId).role(role), null).getBody()
+                    .getEntry();
+            formatProvider.print(siteMember);
+            return 0;
+        }
+
+        @Command(description = "Get site group member details")
+        public Integer get(@Parameters(description = "Id of the Site") String id,
+                           @Parameters(description = "Group Id") String groupId) {
+            SiteGroup siteGroup =
+                    sitesApi.getSiteGroupMembership(id, groupId, null).getBody().getEntry();
+            formatProvider.print(siteGroup);
+            return 0;
+        }
+
+        @Command(description = "Update site group member")
+        public Integer update(@Parameters(description = "Id of the Site") String id,
+                              @Parameters(description = "Group Id") String groupId, @Parameters(
+                description = "Role in the Site. Valid values: ${COMPLETION-CANDIDATES}") SiteMembershipBodyUpdate.RoleEnum role) {
+            SiteGroup siteGroup = sitesApi.updateSiteGroupMembership(id, groupId,
+                    new SiteMembershipBodyUpdate().role(role), null).getBody().getEntry();
+            formatProvider.print(siteGroup);
+            return 0;
+        }
+
+        @Command(description = "Delete site group member")
+        public Integer delete(@Parameters(description = "Id of the Site") String id,
+                              @Parameters(description = "User Id") String groupId) {
+            sitesApi.deleteSiteGroupMembership(id, groupId);
+            formatProvider.print(groupId);
+            return 0;
+        }
+
+    }
 
     @Component
     static class SiteProvider implements FormatProvider {
@@ -348,10 +408,10 @@ public class SiteCommand {
         public void print(Object item) {
             final SiteRole siteRole = (SiteRole) item;
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("%-20s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
+            System.out.printf("%-40s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
             System.out.println();
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("%-20s %-20s %-20s", siteRole.getId(), siteRole.getRole(), siteRole.getSite().getVisibility());
+            System.out.printf("%-40s %-20s %-20s", siteRole.getId(), siteRole.getRole(), siteRole.getSite().getVisibility());
             System.out.println();
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
         }
@@ -385,11 +445,11 @@ public class SiteCommand {
             final SiteRolePagingList siteRoleList = (SiteRolePagingList) item;
             List<SiteRoleEntry> entries = siteRoleList.getEntries();
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
-            System.out.printf("%-20s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
+            System.out.printf("%-40s %-20s %-20s", "ID", "ROLE", "VISIBILITY");
             System.out.println();
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
             entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
-                System.out.printf("%-20s %-20s %-20s", entry.getId(), entry.getRole(), entry.getSite().getVisibility());
+                System.out.printf("%-40s %-20s %-20s", entry.getId(), entry.getRole(), entry.getSite().getVisibility());
                 System.out.println();
             });
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
@@ -419,4 +479,84 @@ public class SiteCommand {
             return ID.equals(format) && SiteRolePagingList.class == itemClass;
         }
     }
+
+    @Component
+    static class SiteGroupProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteGroup siteRole = (SiteGroup) item;
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", "ID", "ROLE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", siteRole.getId(), siteRole.getRole());
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteGroup.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteGroupIdProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteGroup siteGroup = (SiteGroup) item;
+            System.out.printf(siteGroup.getId());
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteGroup.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteGroupPagingListProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteGroupPagingList siteGroupList = (SiteGroupPagingList) item;
+            List<SiteGroupEntry> entries = siteGroupList.getEntries();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-40s %-20s", "ID", "ROLE");
+            System.out.println();
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            entries.stream().map(entry -> entry.getEntry()).forEach(entry -> {
+                System.out.printf("%-40s %-20s", entry.getId(), entry.getRole());
+                System.out.println();
+            });
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return DEFAULT.equals(format) && SiteGroupPagingList.class == itemClass;
+        }
+    }
+
+    @Component
+    static class SiteGroupPagingListIdsProvider implements FormatProvider {
+
+        @Override
+        public void print(Object item) {
+            final SiteGroupPagingList siteGroupList = (SiteGroupPagingList) item;
+            List<SiteGroupEntry> entries = siteGroupList.getEntries();
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
+        }
+
+        @Override
+        public boolean isApplicable(Class<?> itemClass, String format) {
+            return ID.equals(format) && SiteGroupPagingList.class == itemClass;
+        }
+    }
+
 }
