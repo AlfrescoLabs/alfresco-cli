@@ -6,138 +6,191 @@
  */
 package org.alfresco.cli.acs;
 
-import java.util.List;
-import org.alfresco.cli.acs.GroupCommand.GroupMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.GroupsApi;
-import org.alfresco.core.model.Group;
-import org.alfresco.core.model.GroupBodyCreate;
-import org.alfresco.core.model.GroupBodyUpdate;
-import org.alfresco.core.model.GroupEntry;
-import org.alfresco.core.model.GroupMember;
-import org.alfresco.core.model.GroupMemberEntry;
-import org.alfresco.core.model.GroupMemberPagingList;
-import org.alfresco.core.model.GroupMembershipBodyCreate;
+import org.alfresco.core.model.*;
 import org.alfresco.core.model.GroupMembershipBodyCreate.MemberTypeEnum;
-import org.alfresco.core.model.GroupPaging;
-import org.alfresco.core.model.GroupPagingList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+
 @Component
-@Command(name = "group", description = "Group commands", subcommands = GroupMemberCommand.class)
+@Command(name = "group", description = "Group commands", subcommands = {
+        GroupCommand.ListGroup.class,
+        GroupCommand.CreateGroup.class,
+        GroupCommand.GetGroup.class,
+        GroupCommand.UpdateGroup.class,
+        GroupCommand.DeleteGroup.class,
+        GroupCommand.ListGroupMember.class,
+        GroupCommand.CreateGroupMember.class,
+        GroupCommand.DeleteGroupMember.class})
 public class GroupCommand {
 
-    @Autowired
-    ApplicationContext appCtx;
-    
-    @Autowired
-    GroupsApi groupsApi;
+    static abstract class AbstractGroupsCommand implements Callable<Integer> {
 
-    @CommandLine.Mixin
-    FormatProviderRegistry formatProvider;
-
-    @Command(description = "Get group list")
-    public Integer list(
-            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                    description = "Number of items to be skipped") Integer skipCount,
-            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                    description = "Number of items to be returned") Integer maxItems,
-            @Option(names = {"-w", "--where"},
-                    description = "Filter for returned items") String where) {
-        ResponseEntity<GroupPaging> response =
-                groupsApi.listGroups(skipCount, maxItems, null, null, where, null);
-        GroupPagingList result = response.getBody().getList();
-        formatProvider.print(result);
-        return 0;
-    }
-
-    @Command(description = "Create group")
-    public Integer create(@Parameters(description = "Id of the Site") String id,
-            @Option(names = {"-dn", "--displayName"}, required = true,
-                    description = "Display name") String displayName,
-            @Option(names = {"-pi", "--parentIds"},
-                    description = "Parent group identifiers") List<String> parentIds) {
-        Group result = groupsApi.createGroup(
-                new GroupBodyCreate().id(id).displayName(displayName).parentIds(parentIds), null,
-                null).getBody().getEntry();
-        formatProvider.print(result);
-        return 0;
-    }
-
-    @Command(description = "Get group details")
-    public Integer get(@Parameters(description = "Group identifier") String id) {
-        Group result = groupsApi.getGroup(id, null, null).getBody().getEntry();
-        formatProvider.print(result);
-        return 0;
-    }
-
-    @Command(description = "Update group")
-    public Integer update(@Parameters(description = "Group identifier") String id,
-            @Option(names = {"-dn", "--displayName"}, required = true,
-                    description = "Display name") String displayName) {
-        Group result = groupsApi
-                .updateGroup(id, new GroupBodyUpdate().displayName(displayName), null, null)
-                .getBody().getEntry();
-        formatProvider.print(result);
-        return 0;
-    }
-
-    @Command(description = "Delete group")
-    public Integer delete(@Parameters(description = "Group identifier") String id,
-            @Option(names = {"-c", "--cascade"}, defaultValue = "false",
-                    description = "Cascade deleted: true, false") Boolean cascade) {
-        groupsApi.deleteGroup(id, cascade);
-        formatProvider.print(id);
-        return 0;
-    }
-
-    @Component
-    @Command(name = "member", description = "List, create and delete group members")
-    static class GroupMemberCommand {
-
-        @Autowired
-        private GroupsApi groupsApi;
-
-        @CommandLine.Mixin
+        @Mixin
         FormatProviderRegistry formatProvider;
 
-        @Command(description = "List group members")
-        public Integer list(@Parameters(description = "Group identifier") String id,
-                @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of items to be skipped") Integer skipCount,
-                @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of items to be returned") Integer maxItems,
-                @Option(names = {"-w", "--where"},
-                        description = "Filter for returned items") String where) {
+        @Autowired
+        GroupsApi groupsApi;
+
+    }
+
+    @Command(name = "list", description = "Get group list", mixinStandardHelpOptions = true)
+    class ListGroup extends AbstractGroupsCommand {
+
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned items")
+        String where;
+
+        @Override
+        public Integer call() throws Exception {
+            ResponseEntity<GroupPaging> response =
+                    groupsApi.listGroups(skipCount, maxItems, null, null, where, null);
+            GroupPagingList result = response.getBody().getList();
+            formatProvider.print(result);
+            return 0;
+        }
+    }
+
+    @Command(name = "create", description = "Create group", mixinStandardHelpOptions = true)
+    class CreateGroup extends AbstractGroupsCommand {
+
+        @Parameters(description = "Id of the Group")
+        String id;
+        @Option(names = {"-dn", "--displayName"}, required = true,
+                description = "Display name")
+        String displayName;
+        @Option(names = {"-pi", "--parentIds"},
+                description = "Parent group identifiers")
+        List<String> parentIds;
+
+        @Override
+        public Integer call() throws Exception {
+            Group result = groupsApi.createGroup(
+                    new GroupBodyCreate().id(id).displayName(displayName).parentIds(parentIds), null,
+                    null).getBody().getEntry();
+            formatProvider.print(result);
+            return 0;
+        }
+    }
+
+    @Command(name = "get", description = "Get group details", mixinStandardHelpOptions = true)
+    class GetGroup extends AbstractGroupsCommand {
+
+        @Parameters(description = "Group identifier")
+        String id;
+
+        @Override
+        public Integer call() throws Exception {
+            Group result = groupsApi.getGroup(id, null, null).getBody().getEntry();
+            formatProvider.print(result);
+            return 0;
+        }
+    }
+
+    @Command(name = "update", description = "Update group", mixinStandardHelpOptions = true)
+    class UpdateGroup extends AbstractGroupsCommand {
+
+        @Parameters(description = "Group identifier")
+        String id;
+        @Option(names = {"-dn", "--displayName"}, required = true,
+                description = "Display name")
+        String displayName;
+
+        @Override
+        public Integer call() throws Exception {
+            Group result = groupsApi
+                    .updateGroup(id, new GroupBodyUpdate().displayName(displayName), null, null)
+                    .getBody().getEntry();
+            formatProvider.print(result);
+            return 0;
+        }
+    }
+
+    @Command(name = "delete", description = "Delete group", mixinStandardHelpOptions = true)
+    class DeleteGroup extends AbstractGroupsCommand {
+        @Parameters(description = "Group identifier")
+        String id;
+        @Option(names = {"-c", "--cascade"}, defaultValue = "false",
+                description = "Cascade deleted: true, false")
+        Boolean cascade;
+
+        @Override
+        public Integer call() throws Exception {
+            groupsApi.deleteGroup(id, cascade);
+            formatProvider.print(id);
+            return 0;
+        }
+    }
+
+    @Command(name = "list-member", description = "List group members", mixinStandardHelpOptions = true)
+    class ListGroupMember extends AbstractGroupsCommand {
+        @Parameters(description = "Group identifier")
+        String id;
+        @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                description = "Number of items to be skipped")
+        Integer skipCount;
+        @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                description = "Number of items to be returned")
+        Integer maxItems;
+        @Option(names = {"-w", "--where"},
+                description = "Filter for returned items")
+        String where;
+
+        @Override
+        public Integer call() throws Exception {
             GroupMemberPagingList result =
                     groupsApi.listGroupMemberships(id, skipCount, maxItems, null, where, null)
                             .getBody().getList();
             formatProvider.print(result);
             return 0;
         }
+    }
 
-        @Command(description = "Create group member")
-        public Integer create(@Parameters(description = "Group identifier") String id,
-                @Parameters(description = "User Id") String memberId, @Parameters(
-                        description = "Member type. Valid values: ${COMPLETION-CANDIDATES}") MemberTypeEnum memberType) {
+    @Command(name = "create-member", description = "Create group member", mixinStandardHelpOptions = true)
+    class CreateGroupMember extends AbstractGroupsCommand {
+        @Parameters(description = "Group identifier")
+        String id;
+        @Parameters(description = "User Id")
+        String memberId;
+        @Parameters(
+                description = "Member type. Valid values: ${COMPLETION-CANDIDATES}")
+        MemberTypeEnum memberType;
+
+        @Override
+        public Integer call() throws Exception {
             GroupMember result = groupsApi.createGroupMembership(id,
                     new GroupMembershipBodyCreate().id(memberId).memberType(memberType), null)
                     .getBody().getEntry();
             formatProvider.print(result);
             return 0;
         }
+    }
 
-        @Command(description = "Delete group member")
-        public Integer delete(@Parameters(description = "Group identifier") String id,
-                @Parameters(description = "User Id") String personId) {
+    @Command(name = "delete-member", description = "Delete group member", mixinStandardHelpOptions = true)
+    class DeleteGroupMember extends AbstractGroupsCommand {
+        @Parameters(description = "Group identifier")
+        String id;
+        @Parameters(description = "User Id")
+        String personId;
+
+        @Override
+        public Integer call() throws Exception {
             groupsApi.deleteGroupMembership(id, personId);
             formatProvider.print(personId);
             return 0;
@@ -156,7 +209,7 @@ public class GroupCommand {
             System.out.println("----------------------------------------------------------------------------------------------------------------------");
             System.out.printf("%-40s %-40s %-80s", group.getId(), group.getDisplayName(), (group.getParentIds() == null ? "" : group.getParentIds()));
             System.out.println();
-        System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
         }
 
         @Override
@@ -301,4 +354,5 @@ public class GroupCommand {
             return ID.equals(format) && GroupMemberPagingList.class == itemClass;
         }
     }
+
 }
