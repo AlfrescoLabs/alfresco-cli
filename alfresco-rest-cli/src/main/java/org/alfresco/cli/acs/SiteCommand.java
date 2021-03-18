@@ -1,32 +1,19 @@
 package org.alfresco.cli.acs;
 
-import java.util.List;
 import org.alfresco.cli.acs.SiteCommand.SiteContainerCommand;
 import org.alfresco.cli.acs.SiteCommand.SiteMemberCommand;
 import org.alfresco.cli.format.FormatProvider;
 import org.alfresco.cli.format.FormatProviderRegistry;
 import org.alfresco.core.handler.SitesApi;
-import org.alfresco.core.model.Site;
-import org.alfresco.core.model.SiteBodyCreate;
-import org.alfresco.core.model.SiteBodyUpdate;
-import org.alfresco.core.model.SiteContainer;
-import org.alfresco.core.model.SiteContainerEntry;
-import org.alfresco.core.model.SiteContainerPagingList;
-import org.alfresco.core.model.SiteEntry;
-import org.alfresco.core.model.SiteMember;
-import org.alfresco.core.model.SiteMemberPagingList;
-import org.alfresco.core.model.SiteMembershipBodyCreate;
-import org.alfresco.core.model.SiteMembershipBodyUpdate;
-import org.alfresco.core.model.SitePagingList;
-import org.alfresco.core.model.SiteRole;
-import org.alfresco.core.model.SiteRoleEntry;
-import org.alfresco.core.model.SiteRolePagingList;
+import org.alfresco.core.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.util.List;
 
 @Component
 @Command(name = "site", subcommands = {SiteContainerCommand.class, SiteMemberCommand.class},
@@ -142,12 +129,14 @@ public class SiteCommand {
 
         @Command(description = "Get site members list")
         public Integer list(@Parameters(description = "Id of the Site") String id,
-                @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
-                        description = "Number of items to be skipped") Integer skipCount,
-                @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
-                        description = "Number of items to be returned") Integer maxItems) {
+                            @Option(names = {"-sc", "--skip-count"}, defaultValue = "0",
+                                    description = "Number of items to be skipped") Integer skipCount,
+                            @Option(names = {"-mi", "--max-items"}, defaultValue = "100",
+                                    description = "Number of items to be returned") Integer maxItems,
+                            @Option(names = {"-w", "--where"},
+                                    description = "Filter for returned sites") String where) {
             SiteMemberPagingList members =
-                    sitesApi.listSiteMemberships(id, skipCount, maxItems, null).getBody().getList();
+                    sitesApi.listSiteMemberships(id, skipCount, maxItems, null, where).getBody().getList();
             formatProvider.print(members);
             return 0;
         }

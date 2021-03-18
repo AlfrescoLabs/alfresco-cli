@@ -135,7 +135,7 @@ public class NodesCommand {
                     .name(effectiveName).properties(metadata).aspectNames(aspects);
 
             ResponseEntity<NodeEntry> responseEntity =
-                    nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null);
+                    nodesApi.createNode(getNodeId(parent), nodeBodyCreate, true, null, null, null, null);
             return responseEntity.getBody().getEntry();
         }
     }
@@ -218,7 +218,7 @@ public class NodesCommand {
 
         @Option(names = {"-m", "--metadata"},
                 description = "One or more metadata properties. E.g. -m cm:title=\"Proposal\"")
-        Map<String, String> metadata = Collections.emptyMap();
+        Map<String, Object> metadata = Collections.emptyMap();
 
         Optional<Node> updateNodeContent(String nodeId, Boolean majorVersion, String comment)
                 throws IOException {
