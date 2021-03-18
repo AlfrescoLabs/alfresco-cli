@@ -13,7 +13,7 @@ import picocli.CommandLine;
 
 public class FormatProviderRegistry {
 
-    @CommandLine.Option(names = {"-f", "--format"}, description = "Output format. E.g.: 'default' or 'json'.")
+    @CommandLine.Option(names = {"-f", "--format"}, description = "Output format. E.g.: 'default', 'json' or 'id'.")
     String format = FormatProvider.DEFAULT;
 
     @Autowired
