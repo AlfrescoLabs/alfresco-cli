@@ -9,6 +9,7 @@ package org.alfresco.cli;
 import org.alfresco.cli.acs.AcsCommand;
 import org.alfresco.cli.ags.AgsCommand;
 import org.alfresco.cli.apa.ApaCommand;
+import org.alfresco.cli.config.ConfigCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ScopeType;
@@ -16,7 +17,7 @@ import picocli.CommandLine.ScopeType;
 @Component
 @Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 1, showDefaultValues = true, usageHelpAutoWidth = true,
-        version = "1.0", subcommands = {AcsCommand.class, AgsCommand.class, ApaCommand.class},
+        version = "1.0", subcommands = {AcsCommand.class, AgsCommand.class, ApaCommand.class, ConfigCommand.class},
         synopsisHeading = "    _   _  __                         _ _ \n"
                 + "   /_\\ | |/ _|_ _ ___ _____ ___    __| (_)\n"
                 + "  / _ \\| |  _| '_/ -_(_-/ _/ _ \\  / _| | |\n"
