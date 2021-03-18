@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.alfresco</groupId>
+    <artifactId>alfresco-cli</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <groupId>org.alfresco</groupId>
+  <artifactId>alfresco-event-cli</artifactId>
+  <version>1.0.0</version>
+  <name>alfresco-event-cli</name>
+  <description>Alfresco Command Line Interface</description>
+  <properties>
+    <java.version>11</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli-spring-boot-starter</artifactId>
+      <version>4.6.1</version>
+    </dependency>
+
+    <!-- Java EVENT API -->
+    <dependency>
+      <groupId>org.alfresco</groupId>
+      <artifactId>alfresco-java-event-api-spring-boot-starter</artifactId>
+      <version>5.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Java REST API -->
+    <dependency>
+      <groupId>org.alfresco</groupId>
+      <artifactId>alfresco-java-rest-api-spring-boot-starter</artifactId>
+      <version>5.0.0-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <executable>true</executable>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <echo>Copying configuration</echo>
+                <copy
+                        file="src/main/resources/alfresco-event-cli-1.0.0.conf"
+                        tofile="${basedir}/target/alfresco-event-cli-1.0.0.conf" />
+                <copy
+                        file="${basedir}/target/alfresco-event-cli-1.0.0.jar"
+                        tofile="${basedir}/target/alfresco-stream" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

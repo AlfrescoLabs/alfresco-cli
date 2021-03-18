@@ -225,7 +225,7 @@ public class NodesCommand {
             if (source != null) {
                 ResponseEntity<NodeEntry> responseEntity =
                         nodesApi.updateNodeContent(nodeId, FileUtils.readFileToByteArray(source),
-                                majorVersion, comment, name, null, null);
+                                majorVersion, comment, null, null, null);
                 return Optional.of(responseEntity.getBody().getEntry());
             } else {
                 return Optional.empty();
@@ -308,8 +308,10 @@ public class NodesCommand {
         public void print(Object item) {
             final NodeChildAssociationPagingList ncaList = (NodeChildAssociationPagingList) item;
             List<NodeChildAssociationEntry> entries = ncaList.getEntries();
-            entries.stream().map(entry -> entry.getEntry().getId())
-                    .reduce((e1, e2) -> e1 + ", " + e2).ifPresent(System.out::printf);
+            entries.stream()
+                    .map(entry -> entry.getEntry().getId())
+                    .reduce((e1, e2) -> e1 + ", " + e2)
+                    .ifPresent(System.out::printf);
         }
 
         @Override
