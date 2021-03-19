@@ -57,7 +57,7 @@ Configuration for ACS and ActiveMQ can be stored locally in your home folder in 
 For instance, to configure an ACS server following command may be used.
 
 ```
-$ target/alfresco config acs http://localhost:8080 admin admin
+$ target/alfresco-stream config acs http://localhost:8080 admin admin
 ```
 
 ## Watch folder command
