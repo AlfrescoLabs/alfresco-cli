@@ -166,6 +166,6 @@ $ target/alfresco acs node list -f json
 And finally, a list of IDs can be obtained using this option.
 
 ```
-$ $ target/alfresco acs node list -f id
+$ target/alfresco acs node list -f id
 0913c13d-1a34-41d8-90c9-5ebd8617b2de, f5e7fbae-f5a5-416b-97a5-3bef3bd483d3, 631d7461-ee01-4dcf-979f-02b4c4afd0e8, 6d81b1bc-dfa9-4875-8053-ce7bf5a7d889, 93d41181-9660-45b3-b6e1-82018289ad7c, f1990e51-e36e-46b9-b667-18947ccb7487, 267e5175-cd79-4ed6-8877-3f23011051c
 ```
