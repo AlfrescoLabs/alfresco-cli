@@ -25,6 +25,7 @@ import org.alfresco.core.model.NodeChildAssociationPagingList;
 import org.alfresco.core.model.NodeEntry;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -36,7 +37,7 @@ import picocli.CommandLine.Mixin;
 @Command(name = "node", description = "Node commands",
         subcommands = {NodesCommand.ListNodeCommand.class, NodesCommand.UpdateNodeCommand.class,
                 NodesCommand.CreateNodeCommand.class, NodesCommand.GetNodeCommand.class,
-                NodesCommand.DeleteNodeCommand.class})
+                NodesCommand.GetContentNodeCommand.class, NodesCommand.DeleteNodeCommand.class})
 public class NodesCommand {
 
     private static final String ROOT_PATH = "/";
@@ -83,6 +84,30 @@ public class NodesCommand {
     }
 
     @Component
+    @Command(name = "get-content", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
+    static class GetContentNodeCommand extends AbstractNodesCommand {
+
+        @Parameters(index = "0",
+                description = "The id or relative path of the node to be retrieved")
+        private String node;
+
+        @Option(names = {"-d", "--download"},
+                description = "Download folder absolute path")
+        String downloadFolder = null;
+
+        @Override
+        public Integer call() throws IOException {
+            final String nodeId = getNodeId(node);
+            final Resource resource =
+                    nodesApi.getNodeContent(nodeId, true, null, null).getBody();
+            File file = new File((downloadFolder != null ? downloadFolder + File.separator : "") + resource.getFilename());
+            FileUtils.copyInputStreamToFile(resource.getInputStream(), file);
+            formatProvider.print(file.getPath());
+            return 0;
+        }
+    }
+
+    @Component
     @Command(name = "list", mixinStandardHelpOptions = true, exitCodeOnExecutionException = 44)
     static class ListNodeCommand extends AbstractNodesCommand {
 
@@ -95,7 +120,7 @@ public class NodesCommand {
         Integer skipCount = null;
 
         @Option(names = {"-max", "--max-items"},
-                description = "The maximum number of items to return in the list. (Default valueis 100)")
+                description = "The maximum number of items to return in the list. (Default value is 100)")
         Integer maxItems = null;
 
         @Option(names = {"-ob", "--order-by"},
