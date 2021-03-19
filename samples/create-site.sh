@@ -42,13 +42,21 @@ echo "Document Library ID is $DOCLIB_ID"
 FILE_ID=$($ALF acs node create -n test-admin.sh -s "$PWD/create-site.sh" -p $DOCLIB_ID -f id)
 echo "File ID uploaded by admin is $FILE_ID"
 
+# create a new group
+$ALF acs group create $SITE_NAME-Managers -dn $SITE_NAME-Managers
+echo "Group $SITE_NAME-Managers has been created"
+
 # create a new user
 $ALF acs person create $USER_NAME -e $USER_EMAIL -fn $USER_FIRST_NAME -ln $USER_LAST_NAME -p $USER_PASS
 echo "User $USER_NAME has been created"
 
-# add new user to site as SiteManager
-$ALF acs site create-member $SITE_NAME $USER_NAME SiteManager
-echo "User $USER_NAME has been added as member in the site $SITE_NAME"
+# add user to group
+$ALF acs group create-member GROUP_$SITE_NAME-Managers $USER_NAME PERSON
+echo "User $USER_NAME has been added to group GROUP_$SITE_NAME-Managers"
+
+# add new group to site as SiteManager
+$ALF acs site create-group-member $SITE_NAME GROUP_$SITE_NAME-Managers SiteManager
+echo "Group GROUP_$SITE_NAME-Managers has been added as member in the site $SITE_NAME"
 
 # change user
 echo "Validating credentials for $USER_NAME in $ACS_SERVER_URL"
