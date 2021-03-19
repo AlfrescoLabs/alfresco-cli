@@ -6,6 +6,7 @@
  */
 package org.alfresco.cli;
 
+import org.alfresco.cli.config.ConfigCommand;
 import org.alfresco.cli.watch.WatchCommand;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -14,6 +15,6 @@ import picocli.CommandLine.ScopeType;
 @Component
 @Command(name = "alfresco", scope = ScopeType.INHERIT, mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 1, showDefaultValues = true, usageHelpAutoWidth = true,
-        version = "1.0", subcommands = { WatchCommand.class })
+        version = "1.0", subcommands = { WatchCommand.class, ConfigCommand.class })
 public class AlfrescoCommand {
 }
