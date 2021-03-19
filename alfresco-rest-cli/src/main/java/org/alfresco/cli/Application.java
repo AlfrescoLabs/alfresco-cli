@@ -16,11 +16,11 @@ import picocli.CommandLine.IFactory;
 
 @SpringBootApplication
 
-// Required for ApaCommand
+//Required for ApaCommand
 @EnableFeignClients({"org.alfresco.core.handler", "org.alfresco.discovery.handler",
-        "org.alfresco.governance.core.handler", "org.alfresco.governance.classification.handler",
-        "org.alfresco.search.handler", "org.alfresco.search.sql.handler",
-        "com.alfresco.activiti.runtime.handler"})
+     "org.alfresco.governance.core.handler", "org.alfresco.governance.classification.handler",
+     "org.alfresco.search.handler", "org.alfresco.search.sql.handler",
+     "org.alfresco.cli.apa"})
 public class Application implements CommandLineRunner, ExitCodeGenerator {
 
     private IFactory factory;

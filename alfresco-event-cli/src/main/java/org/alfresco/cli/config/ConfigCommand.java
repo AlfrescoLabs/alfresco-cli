@@ -9,13 +9,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 @Component
 @Command(name = "config", description = "Configuration commands")
 public class ConfigCommand {
 
-    static final String USER_CONFIGURATION_FILE = System.getProperty("user.home") + "/.alfresco-stream/application.properties";
+    static final File USER_CONFIGURATION_FILE =
+            Paths.get(System.getProperty("user.home"), ".alfresco-stream", "application.properties")
+                    .toFile();
 
     @Command(description = "Set configuration for ACS.")
     public Integer acs(@Parameters(description = "Alfresco Content Services URL (example >> \"http://localhost:8080\")") String url,
@@ -40,10 +43,10 @@ public class ConfigCommand {
 
     private Properties getAppProps() throws IOException {
         Properties appProps = new Properties();
-        if (new File(USER_CONFIGURATION_FILE).exists()) {
+        if (USER_CONFIGURATION_FILE.exists()) {
             appProps.load(new FileInputStream(USER_CONFIGURATION_FILE));
         } else {
-            FileUtils.touch(new File(USER_CONFIGURATION_FILE));
+            FileUtils.touch(USER_CONFIGURATION_FILE);
         }
         return appProps;
     }

@@ -8,9 +8,7 @@
     <artifactId>alfresco-cli</artifactId>
     <version>1.0.0</version>
   </parent>
-  <groupId>org.alfresco</groupId>
   <artifactId>alfresco-rest-cli</artifactId>
-  <version>1.0.0</version>
   <name>alfresco-rest-cli</name>
   <description>Alfresco Command Line Interface</description>
   <properties>
@@ -35,6 +33,11 @@
       <groupId>com.alfresco</groupId>
       <artifactId>alfresco-activiti-runtime-rest-api</artifactId>
       <version>7.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth2</artifactId>
+      <version>2.5.0.RELEASE</version>
     </dependency>
     
     <dependency>
